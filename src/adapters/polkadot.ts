@@ -49,6 +49,14 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "calamari",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "6666666667" }, // todo: is this right?
+      weightLimit: "Unlimited",
+    },
+  },
 ];
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {

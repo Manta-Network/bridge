@@ -60,6 +60,22 @@ export const calamariRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "kusama",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "11523248" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "moonriver",
+    token: "MOVR",
+    xcm: {
+      fee: { token: "MOVR", amount: "23356409465885" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const calamariTokensConfig: Record<string, BasicToken> = {
@@ -68,12 +84,14 @@ export const calamariTokensConfig: Record<string, BasicToken> = {
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
+  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "10000000000000000" },
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   KMA: 1,
   KUSD: 9,
   LKSM: 10,
+  MOVR: 11,
   KSM: 12,
   KAR: 8,
 };
@@ -236,19 +254,29 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    let dst: any = {
+      parents: 1,
+      interior: {
+        X2: [
+          { Parachain: toChain.paraChainId },
+          { AccountId32: { id: accountId, network: "Any" } },
+        ],
+      },
+    };
+
+    // to relay-chain
+    if (toChain.id === "kusama" || toChain.id === "polkadot") {
+      dst = {
+        parents: 1,
+        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
+      };
+    }
+
     return this.api?.tx.xTokens.transfer(
       { MantaCurrency: tokenId },
       amount.toChainData(),
       {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
+        V1: dst
       },
       this.getDestWeight(token, to)?.toString()
     );
