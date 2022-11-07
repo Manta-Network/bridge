@@ -95,7 +95,7 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
   ): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token !== this.nativeToken) {
+    if (token !==  'KSM') { // this.nativeToken) {
       throw new CurrencyNotFound(token);
     }
 
