@@ -189,7 +189,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    if (token !== this.balanceAdapter?.nativeToken) {
+    if (token !== 'KSM') { //this.balanceAdapter?.nativeToken) {
       throw new CurrencyNotFound(token);
     }
 
