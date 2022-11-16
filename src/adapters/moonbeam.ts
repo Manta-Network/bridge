@@ -1,15 +1,15 @@
 import { Storage } from "@acala-network/sdk/utils/storage";
 import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
-import { combineLatest, map, Observable } from "rxjs";
+import { combineLatest, from, map, Observable } from "rxjs";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
-
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainName, chains } from "../configs";
 import { ApiNotFound, CurrencyNotFound } from "../errors";
 import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from "../types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { ISubmittableResult } from "@polkadot/types/types";
+import { BN } from "@polkadot/util";
 
 const DEST_WEIGHT = "800000000";
 
@@ -18,7 +18,7 @@ export const moonriverRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "calamari",
     token: "MOVR",
     xcm: {
-      fee: { token: "MOVR", amount: "0" },
+      fee: { token: "MOVR", amount: "2000000000000000" },
       weightLimit: DEST_WEIGHT,
     },
   }
@@ -186,10 +186,15 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
         throw new Error('Unimplemented')
     }
 
-    public override estimateTxFee(params: CrossChainTransferParams): Observable<string> {
-      return new Observable(subscriber => {
-        subscriber.next("0");
-      });
+    public override estimateTxFee(_: CrossChainTransferParams): Observable<string> {
+      const MOONBEAM_XCM_GAS = new BN(35697);
+      return from(
+        (async () => {
+          const baseFee: any = await this.api?.rpc.eth.gasPrice();
+          return baseFee.mul(MOONBEAM_XCM_GAS).toString();
+        })()
+      );
+
     }
   }
 

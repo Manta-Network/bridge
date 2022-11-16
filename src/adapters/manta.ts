@@ -16,6 +16,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { isChainEqual } from "../utils/is-chain-equal";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -246,7 +247,6 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     const tokenId = SUPPORTED_TOKENS[token];
 
@@ -254,23 +254,42 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
-    let dst: any = {
-      parents: 1,
-      interior: {
-        X2: [
-          { Parachain: toChain.paraChainId },
-          { AccountId32: { id: accountId, network: "Any" } },
-        ],
-      },
-    };
+    let dst: any;
+    if (
+      isChainEqual(toChain, "moonriver") ||
+      isChainEqual(toChain, "moonbeam")
+    ) {
+      dst = {
+        parents: 1,
+        interior: {
+          X2: [
+            { Parachain: toChain.paraChainId },
+            { AccountKey20: { key: address, network: "Any" } },
+          ],
+        },
+      };
+    } else {
+      const accountId = this.api?.createType("AccountId32", address).toHex();
+      dst = {
+        parents: 1,
+        interior: {
+          X2: [
+            { Parachain: toChain.paraChainId },
+            { AccountId32: { id: accountId, network: "Any" } },
+          ],
+        },
+      };
+    }
 
     // to relay-chain
     if (toChain.id === "kusama" || toChain.id === "polkadot") {
+      const accountId = this.api?.createType("AccountId32", address).toHex();
       dst = {
         parents: 1,
         interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
       };
     }
+    console.log('dst', dst);
 
     return this.api?.tx.xTokens.transfer(
       { MantaCurrency: tokenId },

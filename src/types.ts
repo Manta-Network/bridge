@@ -1,3 +1,4 @@
+import '@polkadot/api-augment';
 import { FixedPointNumber } from "@acala-network/sdk-core";
 import { ethers } from 'ethers';
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
