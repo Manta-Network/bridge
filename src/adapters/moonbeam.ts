@@ -191,7 +191,10 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
       return from(
         (async () => {
           const baseFee: any = await this.api?.rpc.eth.gasPrice();
-          return baseFee.mul(MOONBEAM_XCM_GAS).toString();
+          const minFee = baseFee.mul(MOONBEAM_XCM_GAS);
+          // Metamask default fee is minFee * 1.5
+          const mediumFee = minFee.mul(new BN(3)).div(new BN(2));
+          return mediumFee.toString();
         })()
       );
 

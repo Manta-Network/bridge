@@ -1,4 +1,3 @@
-import '@polkadot/api-augment';
 import { BaseSDK } from "@acala-network/sdk";
 import { BehaviorSubject, filter, firstValueFrom } from "rxjs";
 
