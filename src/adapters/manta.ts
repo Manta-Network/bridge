@@ -268,6 +268,12 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
           ],
         },
       };
+    } else if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
+      const accountId = this.api?.createType("AccountId32", address).toHex();
+      dst = {
+        parents: 1,
+        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
+      };
     } else {
       const accountId = this.api?.createType("AccountId32", address).toHex();
       dst = {
@@ -280,17 +286,6 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
         },
       };
     }
-
-    // to relay-chain
-    if (toChain.id === "kusama" || toChain.id === "polkadot") {
-      const accountId = this.api?.createType("AccountId32", address).toHex();
-      dst = {
-        parents: 1,
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
-      };
-    }
-    console.log('dst', dst);
-
     return this.api?.tx.xTokens.transfer(
       { MantaCurrency: tokenId },
       amount.toChainData(),
