@@ -42,6 +42,7 @@ export const moonriverTokensConfig: Record<string, BasicToken> = {
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
 };
 
+// fixme: supported tokens should be network specific
 const SUPPORTED_TOKENS: Record<string, string> = {
   MOVR: "MOVR"
 };
@@ -183,7 +184,7 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
     )};
 
     public createTx(params: CrossChainTransferParams): SubmittableExtrinsic<"promise", ISubmittableResult> | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-        throw new Error('Unimplemented')
+      throw new ApiNotFound(this.chain.id);
     }
 
     public override estimateTxFee(_: CrossChainTransferParams): Observable<string> {

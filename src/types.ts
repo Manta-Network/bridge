@@ -1,5 +1,4 @@
 import { FixedPointNumber } from "@acala-network/sdk-core";
-import { ethers } from 'ethers';
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
 import { ChainName } from "./configs";
 
@@ -73,7 +72,6 @@ export interface CrossChainTransferParams {
   amount: FixedPointNumber;
   to: ChainName;
   token: string;
-  provider?: ethers.providers.Web3Provider;
 }
 
 export interface CrossChainInputConfigs {
