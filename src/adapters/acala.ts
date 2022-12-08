@@ -374,38 +374,6 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     },
   },
   {
-    to: "dolphin",
-    token: "DOL",
-    xcm: {
-      fee: { token: "DOL", amount: "4000000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
-    },
-  },
-  {
-    to: "dolphin",
-    token: "KUSD",
-    xcm: {
-      fee: { token: "KUSD", amount: "100000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
-    },
-  },
-  {
-    to: "dolphin",
-    token: "KAR",
-    xcm: {
-      fee: { token: "KAR", amount: "100000000000" },
-      weightLimit: ACALA_DEST_WEIGHT,
-    },
-  },
-  {
-    to: "dolphin",
-    token: "LKSM",
-    xcm: {
-      fee: { token: "LKSM", amount: "7692307692" },
-      weightLimit: ACALA_DEST_WEIGHT,
-    },
-  },
-  {
     to: "moonriver",
     token: "MOVR",
     xcm: {
@@ -630,7 +598,6 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
   },
   LT: { name: "LT", symbol: "LT", decimals: 12, ed: "1000000000000" },
   KMA: { name: "KMA", symbol: "KMA", decimals: 12, ed: "100000000000" },
-  DOL: { name: "DOL", symbol: "DOL", decimals: 18, ed: "100000000000000000" },
   MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "1000000000000000" },
   TUR: { name: "TUR", symbol: "TUR", decimals: 10, ed: "40000000000" },
   HKO: { name: "HKO", symbol: "HKO", decimals: 12, ed: "100000000000" },
