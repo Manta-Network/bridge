@@ -100,6 +100,14 @@ export const kusamaChains = {
     paraChainId: 2084,
     ss58Prefix: 78,
   },
+  dolphin: {
+    id: "dolphin",
+    display: "Dolphin",
+    type: typeSubstrate,
+    icon: "https://resources.acala.network/_next/image?url=%2Fnetworks%2Fcalamari.png&w=96&q=75",
+    paraChainId: 9997,
+    ss58Prefix: 42,
+  },
   integritee: {
     id: "integritee",
     display: "Integritee",

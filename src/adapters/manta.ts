@@ -79,6 +79,34 @@ export const calamariRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
+export const dolphinRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+  {
+    to: "karura",
+    token: "KAR",
+    xcm: {
+      fee: { token: "KAR", amount: "6400000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "kusama",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "11523248" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "moonriver",
+    token: "MOVR",
+    xcm: {
+      fee: { token: "MOVR", amount: "23356409465885" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+];
+
+
 export const calamariTokensConfig: Record<string, BasicToken> = {
   KMA: { name: "KMA", symbol: "KMA", decimals: 12, ed: "100000000000" },
   KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "100000000000" },
@@ -88,13 +116,20 @@ export const calamariTokensConfig: Record<string, BasicToken> = {
   MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "10000000000000000" },
 };
 
+export const dolphinTokensConfig: Record<string, BasicToken> = {
+  DOL: { name: "DOL", symbol: "DOL", decimals: 18, ed: "100000000000000000" },
+  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "100000000000" },
+  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
+  LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
+  KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
+  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "10000000000000000" },
+};
+
 const SUPPORTED_TOKENS: Record<string, number> = {
-  KMA: 1,
-  KUSD: 9,
-  LKSM: 10,
-  MOVR: 11,
-  KSM: 12,
-  KAR: 8,
+  DOL: 1,
+  KSM: 8,
+  MOVR: 9,
+  KAR: 10,
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -117,7 +152,6 @@ const createBalanceStorages = (api: AnyApi) => {
 
 class MantaBalanceAdapter extends BalanceAdapter {
   private storages: ReturnType<typeof createBalanceStorages>;
-
   constructor({ api, chain, tokens }: BalanceAdapterConfigs) {
     super({ api, chain, tokens });
     this.storages = createBalanceStorages(api);
@@ -300,5 +334,11 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
 export class CalamariAdapter extends BaseMantaAdapter {
   constructor() {
     super(chains.calamari, calamariRoutersConfig, calamariTokensConfig);
+  }
+}
+
+export class DolphinAdapter extends BaseMantaAdapter {
+  constructor() {
+    super(chains.dolphin, dolphinRoutersConfig, dolphinTokensConfig);
   }
 }

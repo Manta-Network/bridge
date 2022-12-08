@@ -21,6 +21,14 @@ export const moonriverRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       fee: { token: "MOVR", amount: "2000000000000000" },
       weightLimit: DEST_WEIGHT,
     },
+  },
+  {
+    to: "dolphin",
+    token: "MOVR",
+    xcm: {
+      fee: { token: "MOVR", amount: "2000000000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
   }
 ];
 
