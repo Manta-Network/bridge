@@ -226,7 +226,6 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
         const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
           new FN(feeFactor)
         );
-
         // always minus ed
         return balance
           .minus(fee)
@@ -292,7 +291,8 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
       {
         V1: dst
       },
-      this.getDestWeight(token, to)?.toString()
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      this.getDestWeight(token, to)!.toString()
     );
   }
 }

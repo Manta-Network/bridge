@@ -42,7 +42,6 @@ export const moonriverTokensConfig: Record<string, BasicToken> = {
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
 };
 
-// fixme: supported tokens should be network specific
 const SUPPORTED_TOKENS: Record<string, string> = {
   MOVR: "MOVR"
 };
