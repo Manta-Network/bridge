@@ -65,7 +65,7 @@ export const calamariRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     to: "kusama",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "11523248" },
+      fee: { token: "KSM", amount: "115232479" },
       weightLimit: DEST_WEIGHT,
     },
   },

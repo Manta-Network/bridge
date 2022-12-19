@@ -11,15 +11,14 @@ import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { BN } from "@polkadot/util";
 
-const DEST_WEIGHT = "800000000";
 
 export const moonriverRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   {
     to: "calamari",
     token: "MOVR",
     xcm: {
-      fee: { token: "MOVR", amount: "2000000000000000" },
-      weightLimit: DEST_WEIGHT,
+      fee: { token: "MOVR", amount: "503025000000000" },
+      weightLimit: "Unlimited",
     },
   }
 ];
