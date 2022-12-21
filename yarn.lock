@@ -4730,30 +4730,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@polkawallet/bridge@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "@polkawallet/bridge@workspace:."
-  dependencies:
-    "@acala-network/api": 4.1.8-7
-    "@acala-network/sdk": 4.1.8-7
-    "@acala-network/sdk-core": 4.1.8-7
-    "@open-web3/dev-config": ^0.2.3
-    "@polkadot/api": ^9.9.1
-    "@polkadot/apps-config": ^0.116.1
-    "@polkadot/types": ^9.9.1
-    "@polkadot/types-augment": ^9.9.1
-    "@types/jest": ^28.1.1
-    "@types/lodash": ^4.14.161
-    axios: ^0.27.2
-    eslint-plugin-unused-imports: ^2.0.0
-    jest: ^28.1.1
-    lodash: ^4.17.20
-    typescript: ^4.7.4
-  peerDependencies:
-    "@polkadot/api": ">9"
-  languageName: unknown
-  linkType: soft
-
 "@polymathnetwork/polymesh-types@npm:0.0.2":
   version: 0.0.2
   resolution: "@polymathnetwork/polymesh-types@npm:0.0.2"
@@ -10943,6 +10919,30 @@ __metadata:
   checksum: b38a025a12c8146d6eeea5a7f2bf27d51d8ad6064da8ca9405fcf7bf9b54acd43e3b30ddd7abb9b1bfa4ddb266019133313482570ddb207de568f71ecfcf6060
   languageName: node
   linkType: hard
+
+"manta-polkawallet-bridge-dev@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "manta-polkawallet-bridge-dev@workspace:."
+  dependencies:
+    "@acala-network/api": 4.1.8-7
+    "@acala-network/sdk": 4.1.8-7
+    "@acala-network/sdk-core": 4.1.8-7
+    "@open-web3/dev-config": ^0.2.3
+    "@polkadot/api": ^9.9.1
+    "@polkadot/apps-config": ^0.116.1
+    "@polkadot/types": ^9.9.1
+    "@polkadot/types-augment": ^9.9.1
+    "@types/jest": ^28.1.1
+    "@types/lodash": ^4.14.161
+    axios: ^0.27.2
+    eslint-plugin-unused-imports: ^2.0.0
+    jest: ^28.1.1
+    lodash: ^4.17.20
+    typescript: ^4.7.4
+  peerDependencies:
+    "@polkadot/api": ">9"
+  languageName: unknown
+  linkType: soft
 
 "marked@npm:^4.0.16":
   version: 4.2.4
