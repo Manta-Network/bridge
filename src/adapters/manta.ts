@@ -16,6 +16,7 @@ import {
   CrossChainRouterConfigs,
   CrossChainTransferParams,
 } from "../types";
+import { isChainEqual } from "../utils/is-chain-equal";
 
 const DEST_WEIGHT = "5000000000";
 
@@ -60,6 +61,22 @@ export const calamariRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "kusama",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "115232479" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "moonriver",
+    token: "MOVR",
+    xcm: {
+      fee: { token: "MOVR", amount: "23356409465885" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
 ];
 
 export const calamariTokensConfig: Record<string, BasicToken> = {
@@ -68,12 +85,14 @@ export const calamariTokensConfig: Record<string, BasicToken> = {
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
+  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "10000000000000000" },
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   KMA: 1,
   KUSD: 9,
   LKSM: 10,
+  MOVR: 11,
   KSM: 12,
   KAR: 8,
 };
@@ -207,7 +226,6 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
         const fee = FN.fromInner(txFee, tokenMeta?.decimals).mul(
           new FN(feeFactor)
         );
-
         // always minus ed
         return balance
           .minus(fee)
@@ -228,7 +246,6 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
 
     const tokenId = SUPPORTED_TOKENS[token];
 
@@ -236,19 +253,43 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
       throw new CurrencyNotFound(token);
     }
 
+    let dst: any;
+    if (
+      isChainEqual(toChain, "moonriver") ||
+      isChainEqual(toChain, "moonbeam")
+    ) {
+      dst = {
+        parents: 1,
+        interior: {
+          X2: [
+            { Parachain: toChain.paraChainId },
+            { AccountKey20: { key: address, network: "Any" } },
+          ],
+        },
+      };
+    } else if (isChainEqual(toChain, "kusama") || isChainEqual(toChain, "polkadot")) {
+      const accountId = this.api?.createType("AccountId32", address).toHex();
+      dst = {
+        parents: 1,
+        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
+      };
+    } else {
+      const accountId = this.api?.createType("AccountId32", address).toHex();
+      dst = {
+        parents: 1,
+        interior: {
+          X2: [
+            { Parachain: toChain.paraChainId },
+            { AccountId32: { id: accountId, network: "Any" } },
+          ],
+        },
+      };
+    }
     return this.api?.tx.xTokens.transfer(
       { MantaCurrency: tokenId },
       amount.toChainData(),
       {
-        V1: {
-          parents: 1,
-          interior: {
-            X2: [
-              { Parachain: toChain.paraChainId },
-              { AccountId32: { id: accountId, network: "Any" } },
-            ],
-          },
-        },
+        V1: dst
       },
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.getDestWeight(token, to)!.toString()

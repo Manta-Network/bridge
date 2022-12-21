@@ -49,6 +49,14 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "calamari",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "6666666667" },
+      weightLimit: "Unlimited",
+    },
+  },
 ];
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
@@ -87,7 +95,8 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
   ): Observable<BalanceData> {
     const storage = this.storages.balances(address);
 
-    if (token !== this.nativeToken) {
+    // fixme: should check `token !== this.nativeToken` instead
+    if (token !==  'KSM') {
       throw new CurrencyNotFound(token);
     }
 
@@ -181,7 +190,8 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
-    if (token !== this.balanceAdapter?.nativeToken) {
+    // fixme: should check `token !== this.balanceAdapter?.nativeToken` instead
+    if (token !== 'KSM') {
       throw new CurrencyNotFound(token);
     }
 

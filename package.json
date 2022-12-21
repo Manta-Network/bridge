@@ -1,9 +1,12 @@
 {
-  "name": "@polkawallet/bridge",
-  "version": "0.0.5-10",
+  "name": "manta-polkawallet-bridge",
+  "version": "0.0.0",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
+  "files": [
+    "build/**/*"
+  ],
   "author": "Polkawallet developers <hello@polkawallet.io>",
   "license": "Apache-2.0",
   "engines": {

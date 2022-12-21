@@ -1,5 +1,4 @@
 import { FixedPointNumber } from "@acala-network/sdk-core";
-
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
 import { ChainName } from "./configs";
 
