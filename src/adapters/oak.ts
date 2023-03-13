@@ -63,10 +63,10 @@ export const turingTokensConfig: Record<string, BasicToken> = {
 };
 
 const SUPPORTED_TOKENS: Record<string, string> = {
-  TUR: "TUR",
-  KAR: "KAR",
-  KUSD: "AUSD",
-  LKSM: "LKSM",
+  TUR: "0",
+  KAR: "3",
+  KUSD: "2",
+  LKSM: "4",
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -128,7 +128,7 @@ class OakBalanceAdapter extends BalanceAdapter {
       map((balance) => {
         const amount = FN.fromInner(
           balance.free?.toString() || "0",
-          this.getToken(tokenId).decimals
+          this.getToken(token).decimals
         );
 
         return {
@@ -228,7 +228,7 @@ class BaseOakAdapter extends BaseCrossChainAdapter {
     }
 
     return this.api?.tx.xTokens.transfer(
-      token === this.balanceAdapter?.nativeToken ? "Native" : tokenId,
+      token === this.balanceAdapter?.nativeToken ? "0" : tokenId,
       amount.toChainData(),
       {
         V1: {

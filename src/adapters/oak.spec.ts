@@ -1,39 +1,38 @@
+import { firstValueFrom } from "rxjs";
 
-import { firstValueFrom } from 'rxjs';
+import { ApiProvider } from "../api-provider";
+import { ChainName } from "../configs";
+import { Bridge } from "../bridge";
+import { TuringAdapter } from "./oak";
 
-import { ApiProvider } from '../api-provider';
-import {  ChainName } from '../configs';
-import { Bridge } from '../bridge';
-import { ShidenAdapter } from './astar';
-
-describe.skip('acala-adapter should work', () => {
+describe.skip("oak-adapter should work", () => {
   jest.setTimeout(30000);
 
-  const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
+  const testAccount = "5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN";
   const provider = new ApiProvider();
 
-  async function connect (chain: ChainName) {
+  async function connect(chain: ChainName) {
     return firstValueFrom(provider.connectFromChain([chain], undefined));
   }
 
-  test('connect karura to do xcm', async () => {
-    const fromChain = 'shiden';
+  test("connect turing to do xcm", async () => {
+    const fromChain = "turing";
 
     await connect(fromChain);
 
-    const shiden = new ShidenAdapter();
+    const turing = new TuringAdapter();
 
-    await shiden.setApi(provider.getApi(fromChain));
+    await turing.setApi(provider.getApi(fromChain));
 
     const bridge = new Bridge({
-      adapters: [shiden]
+      adapters: [turing],
     });
 
     // expect(bridge.router.getDestinationChains({ from: chains.karura, token: 'KSM' }).length).toEqual(1);
 
     const adapter = bridge.findAdapter(fromChain);
 
-    async function runMyTestSuit (to: ChainName, token: string) {
+    async function runMyTestSuit(to: ChainName, token: string) {
       if (adapter) {
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
 
@@ -74,6 +73,6 @@ describe.skip('acala-adapter should work', () => {
     }
 
     // await runMyTestSuit('karura', 'SDN');
-    await runMyTestSuit("karura", "KUSD");
+    await runMyTestSuit("turing", "LKSM");
   });
 });

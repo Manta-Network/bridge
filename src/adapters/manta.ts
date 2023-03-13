@@ -85,7 +85,7 @@ export const calamariTokensConfig: Record<string, BasicToken> = {
   KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "10000000000" },
   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
-  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "10000000000000000" },
+  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "100000000000000000" },
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
