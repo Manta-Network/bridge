@@ -47,6 +47,11 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "karura",
     token: "USDT",
     xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
+  },
+  {
+    to: "calamari",
+    token: "USDT",
+    xcm: { fee: { token: "USDT", amount: "25159" }, weightLimit: "Unlimited" },
   }
 ];
 
@@ -264,11 +269,11 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // to karura/acala
+    // to karura / acala / calamari
     const assetId = SUPPORTED_TOKENS[token];
 
     if (
-      (to !== "acala" && to !== "karura") ||
+      (to !== "acala" && to !== "karura" && to !== "calamari") ||
       token === this.balanceAdapter?.nativeToken ||
       !assetId
     ) {
