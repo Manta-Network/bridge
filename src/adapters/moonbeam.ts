@@ -4,15 +4,14 @@ import { combineLatest, from, map, Observable } from "rxjs";
 import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
 import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
-import { BalanceData, BasicToken, CrossChainRouterConfigs, CrossChainTransferParams } from "../types";
+import { ChainId, chains } from "../configs";
+import { ApiNotFound, TokenNotFound } from "../errors";
+import { BalanceData, BasicToken, TransferParams, RouteConfigs } from "../types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { ISubmittableResult } from "@polkadot/types/types";
 import { BN } from "@polkadot/util";
 
-
-export const moonriverRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const moonriverRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "calamari",
     token: "MOVR",
@@ -97,7 +96,7 @@ class MoonbeamBalanceAdapter extends BalanceAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
@@ -122,13 +121,13 @@ class MoonbeamBalanceAdapter extends BalanceAdapter {
 class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: MoonbeamBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
     this.balanceAdapter = new MoonbeamBalanceAdapter({
-      chain: this.chain.id as ChainName,
+      chain: this.chain.id as ChainId,
       api,
       tokens: moonriverTokensConfig,
     });
@@ -146,7 +145,7 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -181,11 +180,7 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
       })
     )};
 
-    public createTx(params: CrossChainTransferParams): SubmittableExtrinsic<"promise", ISubmittableResult> | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-      throw new ApiNotFound(this.chain.id);
-    }
-
-    public override estimateTxFee(_: CrossChainTransferParams): Observable<string> {
+    public override estimateTxFee(_: TransferParams): Observable<string> {
       const MOONBEAM_XCM_GAS = new BN(35697);
       return from(
         (async () => {
@@ -197,6 +192,14 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
         })()
       );
 
+    }
+
+    public createTx(
+      _: TransferParams
+    ):
+      | SubmittableExtrinsic<"promise", ISubmittableResult>
+      | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
+      throw new ApiNotFound(this.chain.id);
     }
   }
 

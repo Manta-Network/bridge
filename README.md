@@ -17,9 +17,11 @@ Polkadot:
 | acala | parallel | PARA ACA AUSD LDOT |
 | acala | interlay | INTR IBTC |
 | acala | astar | ASTR ACA AUSD LDOT |
+| acala | hydraDX | DAI |
 | parallel | acala | PARA ACA AUSD LDOT |
 | interlay | acala | INTR IBTC |
 | astar | acala | ASTR ACA AUSD LDOT |
+| hydraDX | acala | DAI |
 
 Kusama:
 
@@ -46,7 +48,7 @@ Kusama:
 | karura | pichiu | PCHU KAR AUSD LKSM |
 | karura | turing | TUR KAR AUSD LKSM |
 | karura | quartz | QTZ |
-| karura | basilisk | BSX AUSD |
+| karura | basilisk | BSX AUSD DAI USDCet |
 | karura | listen | LT KAR AUSD LKSM |
 | bifrost | karura | BNC KAR AUSD KSM VSKSM |
 | shiden | karura | SDN AUSD |
@@ -64,7 +66,7 @@ Kusama:
 | turing | karura | TUR KAR AUSD LKSM |
 | quartz | karura | QTZ |
 | basilisk | kusama | KSM |
-| basilisk | karura | BSX AUSD KSM |
+| basilisk | karura | BSX AUSD KSM DAI |
 | listen | karura | LT KAR AUSD LKSM |
 
 ## Usage
@@ -115,7 +117,7 @@ const provider = new ApiProvider();
 Connect network and pass the `ApiPromise | ApiRx` into the adapters.
 ```typescript
 // list all available from-chains
-const chains = Object.keys(availableAdapters) as ChainName[];
+const chains = Object.keys(availableAdapters) as ChainId[];
 
 // connect all adapters
 const connected = await firstValueFrom(provider.connectFromChain(chains, undefined));
@@ -182,7 +184,7 @@ export const bifrostTokensConfig: Record<string, MultiChainToken> = {
   VSKSM: { name: 'VSKSM', symbol: 'VSKSM', decimals: 12, ed: '100000000' },
   /// ...other tokens
 };
-export const bifrostRoutersConfig: Omit<CrossChainRouterConfigs, 'from'>[] = [
+export const bifrostRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   /// router for token `BNC` from `bifrost` to `karura`,
   /// `xcm.fee` defines the XCM-Fee on karura,
   /// `xcm.weightLimit` defines the weightLimit value used creating Extrinsic.
@@ -247,7 +249,7 @@ Implement the `subscribeMaxInput` method so the bridge can set transferable toke
 ```typescript
 /// maxInput = availableBalance - estimatedFee - existentialDeposit
 class BaseBifrostAdapter extends BaseCrossChainAdapter {
-  public subscribeMaxInput (token: string, address: string, to: ChainName): Observable<FN> {
+  public subscribeMaxInput (token: string, address: string, to: ChainId): Observable<FN> {
     return combineLatest({
       txFee:
         token === this.balanceAdapter?.nativeToken
@@ -274,7 +276,7 @@ Implement the `createTx` method so the bridge can create the cross-chain transfe
 ```typescript
 /// maxInput = availableBalance - estimatedFee - existentialDeposit
 class BaseBifrostAdapter extends BaseCrossChainAdapter {
-  public createTx (params: CrossChainTransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+  public createTx (params: TransferParams): SubmittableExtrinsic<'promise', ISubmittableResult> | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
     const { address, amount, to, token } = params;
     const toChain = chains[to];
 
@@ -282,7 +284,7 @@ class BaseBifrostAdapter extends BaseCrossChainAdapter {
 
     const tokenId = SUPPORTED_TOKENS[token];
     if (!tokenId) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.api.tx.xTokens.transfer(

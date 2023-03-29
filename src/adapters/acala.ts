@@ -15,19 +15,19 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
+import { ChainId, chains } from "../configs";
 import { ApiNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
-export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "polkadot",
     token: "DOT",
@@ -140,8 +140,16 @@ export const acalaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
+  {
+    to: "hydra",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "2926334210356268" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
 ];
-export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "kusama",
     token: "KSM",
@@ -519,6 +527,22 @@ export const karuraRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     },
   },
   {
+    to: "basilisk",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "4400000000000000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "basilisk",
+    token: "USDCet",
+    xcm: {
+      fee: { token: "USDCet", amount: "4400" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "listen",
     token: "LT",
     xcm: {
@@ -577,6 +601,12 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     ed: "100000000000000000",
   },
   DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "100000000" },
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10000000000000000",
+  },
 };
 
 export const karuraTokensConfig: Record<string, BasicToken> = {
@@ -616,12 +646,24 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
   ARIS: { name: "ARIS", symbol: "ARIS", decimals: 8, ed: "1000000000000" },
   USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "10000" },
   QTZ: { name: "QTZ", symbol: "QTZ", decimals: 18, ed: "1000000000000000000" },
+  DAI: {
+    name: "DAI",
+    symbol: "DAI",
+    decimals: 18,
+    ed: "10000000000000000",
+  },
+  USDCet: {
+    name: "USDCet",
+    symbol: "USDCet",
+    decimals: 6,
+    ed: "10000",
+  },
 };
 
 class BaseAcalaAdapter extends BaseCrossChainAdapter {
   private wallet?: Wallet;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi, wallet?: Wallet) {
     this.api = api;
 
     if (this.api?.type === "rxjs") {
@@ -630,14 +672,19 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     await api.isReady;
 
-    this.wallet = new Wallet(api);
+    // use custom wallet or create a new one
+    if (wallet) {
+      this.wallet = wallet;
+    } else {
+      this.wallet = new Wallet(api);
+    }
 
     await this.wallet.isReady;
   }
 
   public override subscribeMinInput(
     token: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FixedPointNumber> {
     if (!this.wallet) {
       throw new ApiNotFound(this.chain.id);
@@ -677,7 +724,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FixedPointNumber> {
     if (!this.wallet) {
       throw new ApiNotFound(this.chain.id);
@@ -717,7 +764,7 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
