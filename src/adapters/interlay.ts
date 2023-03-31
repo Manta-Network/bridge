@@ -7,22 +7,22 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
+import { ChainId, chains } from "../configs";
 import {
   ApiNotFound,
-  CurrencyNotFound,
+  TokenNotFound,
   DestinationWeightNotFound,
 } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
 const DEST_WEIGHT = "5000000000";
 
-export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const interlayRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "acala",
     token: "INTR",
@@ -38,7 +38,7 @@ export const interlayRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const kintsugiRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const kintsugiRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "KINT",
@@ -112,7 +112,7 @@ class InterlayBalanceAdapter extends BalanceAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.storages.assets(address, tokenId).observable.pipe(
@@ -136,12 +136,12 @@ class InterlayBalanceAdapter extends BalanceAdapter {
 class BaseInterlayAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: InterlayBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    const chain = this.chain.id as ChainName;
+    const chain = this.chain.id as ChainId;
 
     this.balanceAdapter = new InterlayBalanceAdapter({
       chain,
@@ -164,7 +164,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -201,7 +201,7 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
@@ -217,11 +217,22 @@ class BaseInterlayAdapter extends BaseCrossChainAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
-    const destWeight =
+    let destWeight =
+      this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
+      "XcmV2WeightLimit"
+        ? "Unlimited"
+        : this.getDestWeight(token, to);
+
+    if (destWeight === undefined) {
+      throw new DestinationWeightNotFound(this.chain.id, to, token);
+    }
+
+    // use "Unlimited" if the xToken.transfer's fourth parameter version supports it
+    destWeight =
       this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
       "XcmV2WeightLimit"
         ? "Unlimited"

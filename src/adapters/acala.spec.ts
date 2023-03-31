@@ -2,7 +2,7 @@ import { FixedPointNumber } from '@acala-network/sdk-core';
 import { firstValueFrom } from 'rxjs';
 
 import { ApiProvider } from '../api-provider';
-import { chains, ChainName } from '../configs';
+import { chains, ChainId } from '../configs';
 import { Bridge } from '../bridge';
 import { KaruraAdapter } from './acala';
 import { KusamaAdapter } from './polkadot';
@@ -13,21 +13,21 @@ describe.skip('acala-adapter should work', () => {
   const testAccount = '5GREeQcGHt7na341Py6Y6Grr38KUYRvVoiFSiDB52Gt7VZiN';
   const provider = new ApiProvider();
 
-  async function connect (chains: ChainName[]) {
+  async function connect (chains: ChainId[]) {
     // return firstValueFrom(provider.connectFromChain([chain], { karura: ["wss://crosschain-dev.polkawallet.io:9907"] }));
     return firstValueFrom(provider.connectFromChain(chains, undefined));
   }
 
   test('connect karura to do xcm', async () => {
-    const fromChains = ['karura', 'kusama'] as ChainName[];
+    const fromChains = ['karura', 'kusama'] as ChainId[];
 
     await connect(fromChains);
 
     const karura = new KaruraAdapter();
     const kusama = new KusamaAdapter();
 
-    await karura.setApi(provider.getApi(fromChains[0]));
-    await kusama.setApi(provider.getApi(fromChains[1]));
+    await karura.init(provider.getApi(fromChains[0]));
+    await kusama.init(provider.getApi(fromChains[1]));
 
     const bridge = new Bridge({
       adapters: [karura, kusama]
@@ -37,7 +37,7 @@ describe.skip('acala-adapter should work', () => {
 
     const adapter = bridge.findAdapter(fromChains[0]);
 
-    async function runMyTestSuit (to: ChainName, token: string) {
+    async function runMyTestSuit (to: ChainId, token: string) {
       if (adapter) {
         const balance = await firstValueFrom(adapter.subscribeTokenBalance(token, testAccount));
 
@@ -48,7 +48,7 @@ describe.skip('acala-adapter should work', () => {
         expect(balance.free.toNumber()).toBeGreaterThanOrEqual(balance.available.toNumber());
         expect(balance.free.toNumber()).toEqual(balance.locked.add(balance.available).toNumber());
 
-        const inputConfig = await firstValueFrom(adapter.subscribeInputConfigs({ to, token, address: testAccount, signer: testAccount }));
+        const inputConfig = await firstValueFrom(adapter.subscribeInputConfig({ to, token, address: testAccount, signer: testAccount }));
 
         console.log(
           `inputConfig: min-${inputConfig.minInput.toNumber()} max-${inputConfig.maxInput.toNumber()} ss58-${inputConfig.ss58Prefix}`

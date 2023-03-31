@@ -8,16 +8,16 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import { ChainId, chains } from "../configs";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
-export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "acala",
     token: "DOT",
@@ -26,7 +26,7 @@ export const polkadotRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
 ];
 
 // TODO: should remove after kusama upgrade
-export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const kusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "KSM",
@@ -61,7 +61,7 @@ export const kusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
   },
 ];
 
-export const V3KusamaRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const V3KusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "KSM",
@@ -126,7 +126,7 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
 
     // fixme: should check `token !== this.nativeToken` instead
     if (token !==  'KSM') {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return storage.observable.pipe(
@@ -146,12 +146,12 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
 class BasePolkadotAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: PolkadotBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    const chain = this.chain.id as ChainName;
+    const chain = this.chain.id as ChainId;
 
     this.balanceAdapter = new PolkadotBalanceAdapter({
       chain,
@@ -180,7 +180,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -228,7 +228,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
@@ -241,7 +241,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     // fixme: should check `token !== this.balanceAdapter?.nativeToken` instead
     if (token !== 'KSM') {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     const isV0V1Support = this.isV0V1;

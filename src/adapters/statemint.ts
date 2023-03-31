@@ -9,16 +9,16 @@ import { BN } from "@polkadot/util";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import { ChainId, chains } from "../configs";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 
-export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "kusama",
     token: "KSM",
@@ -48,6 +48,11 @@ export const statemineRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
     token: "USDT",
     xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
   },
+  {
+    to: "calamari",
+    token: "USDT",
+    xcm: { fee: { token: "USDT", amount: "25159" }, weightLimit: "Unlimited" },
+  }
 ];
 
 export const statemineTokensConfig: Record<
@@ -132,7 +137,7 @@ class StatemintBalanceAdapter extends BalanceAdapter {
     const assetId = SUPPORTED_TOKENS[token];
 
     if (assetId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return combineLatest({
@@ -159,12 +164,12 @@ class StatemintBalanceAdapter extends BalanceAdapter {
 class BaseStatemintAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: StatemintBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
-    const chain = this.chain.id as ChainName;
+    const chain = this.chain.id as ChainId;
 
     this.balanceAdapter = new StatemintBalanceAdapter({
       api,
@@ -187,7 +192,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -224,7 +229,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
@@ -240,7 +245,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
     // to relay chain
     if (to === "kusama" || to === "polkadot") {
       if (token !== this.balanceAdapter?.nativeToken) {
-        throw new CurrencyNotFound(token);
+        throw new TokenNotFound(token);
       }
 
       const dst = { interior: "Here", parents: 1 };
@@ -264,15 +269,15 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // to karura/acala
+    // to karura / acala / calamari
     const assetId = SUPPORTED_TOKENS[token];
 
     if (
-      (to !== "acala" && to !== "karura") ||
+      (to !== "acala" && to !== "karura" && to !== "calamari") ||
       token === this.balanceAdapter?.nativeToken ||
       !assetId
     ) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };

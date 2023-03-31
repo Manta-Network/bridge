@@ -8,19 +8,19 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainName, chains } from "../configs";
-import { ApiNotFound, CurrencyNotFound } from "../errors";
+import { ChainId, chains } from "../configs";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
-  CrossChainRouterConfigs,
-  CrossChainTransferParams,
+  RouteConfigs,
+  TransferParams,
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
 
 const DEST_WEIGHT = "5000000000";
 
-export const calamariRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
+export const calamariRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "KMA",
@@ -77,6 +77,14 @@ export const calamariRoutersConfig: Omit<CrossChainRouterConfigs, "from">[] = [
       weightLimit: DEST_WEIGHT,
     },
   },
+  {
+    to: "statemine",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "1183" },
+      weightLimit: DEST_WEIGHT,
+    },
+  }
 ];
 
 export const calamariTokensConfig: Record<string, BasicToken> = {
@@ -86,15 +94,17 @@ export const calamariTokensConfig: Record<string, BasicToken> = {
   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
   MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "100000000000000000" },
+  USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "10000" }
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
   KMA: 1,
+  KAR: 8,
   KUSD: 9,
   LKSM: 10,
   MOVR: 11,
   KSM: 12,
-  KAR: 8,
+  USDT: 14
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -149,7 +159,7 @@ class MantaBalanceAdapter extends BalanceAdapter {
     const tokenID = SUPPORTED_TOKENS[token];
 
     if (tokenID === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     return this.storages.assets(tokenID, address).observable.pipe(
@@ -173,13 +183,13 @@ class MantaBalanceAdapter extends BalanceAdapter {
 class BaseMantaAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: MantaBalanceAdapter;
 
-  public override async setApi(api: AnyApi) {
+  public async init(api: AnyApi) {
     this.api = api;
 
     await api.isReady;
 
     this.balanceAdapter = new MantaBalanceAdapter({
-      chain: this.chain.id as ChainName,
+      chain: this.chain.id as ChainId,
       api,
       tokens: calamariTokensConfig,
     });
@@ -199,7 +209,7 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
   public subscribeMaxInput(
     token: string,
     address: string,
-    to: ChainName
+    to: ChainId
   ): Observable<FN> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
@@ -235,7 +245,7 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
   }
 
   public createTx(
-    params: CrossChainTransferParams
+    params: TransferParams
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
@@ -250,7 +260,7 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     const tokenId = SUPPORTED_TOKENS[token];
 
     if (tokenId === undefined) {
-      throw new CurrencyNotFound(token);
+      throw new TokenNotFound(token);
     }
 
     let dst: any;

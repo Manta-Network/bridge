@@ -2,13 +2,8 @@ import { isEmpty, overEvery, uniqWith } from "lodash";
 
 import { isChainEqual } from "./utils/is-chain-equal";
 import { BaseCrossChainAdapter } from "./base-chain-adapter";
-import { ChainName, chains } from "./configs";
-import {
-  Chain,
-  CrossChainRouter,
-  CrossChainRouterConfigs,
-  RouterFilter,
-} from "./types";
+import { ChainId, chains } from "./configs";
+import { Chain, CrossChainRouter, RouteConfigs, RouterFilter } from "./types";
 import { fetchConfigFromApiOrLocal } from "./utils";
 
 interface BridgeRouterManagerConfigs {
@@ -45,12 +40,12 @@ export class BridgeRouterManager {
   }
 
   public findAdapterByName(
-    chain: ChainName | Chain
+    chain: ChainId | Chain
   ): BaseCrossChainAdapter | undefined {
     return this.adapters.find((i) => isChainEqual(chain, i.chain));
   }
 
-  public addRouter(router: CrossChainRouterConfigs, checkAdapter = true) {
+  public addRouter(router: RouteConfigs, checkAdapter = true) {
     const { token, xcm } = router;
     const from =
       typeof router.from === "string" ? chains[router.from] : router.from;
@@ -62,7 +57,7 @@ export class BridgeRouterManager {
     }
   }
 
-  public addRouters(routers: CrossChainRouterConfigs[], checkAdapter = true) {
+  public addRouters(routers: RouteConfigs[], checkAdapter = true) {
     routers.map((i) => this.addRouter(i, checkAdapter));
   }
 
