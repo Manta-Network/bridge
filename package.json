@@ -1,6 +1,6 @@
 {
     "name": "manta-polkawallet-bridge",
-    "version": "0.2.0-dev",
+    "version": "0.3.0",
     "description": "polkawallet bridge sdk",
     "main": "index.js",
     "types": "index.d.ts",
