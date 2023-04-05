@@ -62,6 +62,22 @@ export const calamariRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
+    to: "karura",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "808240000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "USDCet",
+    xcm: {
+      fee: { token: "USDCet", amount: "808" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
     to: "kusama",
     token: "KSM",
     xcm: {
@@ -94,7 +110,10 @@ export const calamariTokensConfig: Record<string, BasicToken> = {
   LKSM: { name: "LKSM", symbol: "LKSM", decimals: 12, ed: "500000000" },
   KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "100000000" },
   MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "100000000000000000" },
-  USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "10000" }
+  USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "10000" },
+  DAI: { name: "DAI", symbol: "DAI", decimals: 18, ed: "10000000000000000" },
+  USDCet: { name: "USDCet", symbol: "USDCet", decimals: 6, ed: "10000" }
+
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
@@ -104,7 +123,9 @@ const SUPPORTED_TOKENS: Record<string, number> = {
   LKSM: 10,
   MOVR: 11,
   KSM: 12,
-  USDT: 14
+  USDT: 14,
+  DAI: 15,
+  USDCet: 16
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

@@ -391,6 +391,22 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
+    to: "calamari",
+    token: "DAI",
+    xcm: {
+      fee: { token: "DAI", amount: "25159325000000000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "calamari",
+    token: "USDCet",
+    xcm: {
+      fee: { token: "USDCet", amount: "25159" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "moonriver",
     token: "MOVR",
     xcm: {
