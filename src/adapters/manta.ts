@@ -81,7 +81,7 @@ export const calamariRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "kusama",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "115232479" },
+      fee: { token: "KSM", amount: "90287436" },
       weightLimit: DEST_WEIGHT,
     },
   },

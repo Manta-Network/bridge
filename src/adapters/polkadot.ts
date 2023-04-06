@@ -86,6 +86,14 @@ export const V3KusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
       weightLimit: "Unlimited",
     },
   },
+  {
+    to: "calamari",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "167728833" },
+      weightLimit: "Unlimited",
+    },
+  },
 ];
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
