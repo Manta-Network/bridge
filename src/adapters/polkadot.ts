@@ -47,15 +47,7 @@ export const kusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "statemine",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "4000000000" },
-      weightLimit: "Unlimited",
-    },
-  },
-  {
-    to: "calamari",
-    token: "KSM",
-    xcm: {
-      fee: { token: "KSM", amount: "6666666667" },
+      fee: { token: "KSM", amount: "5275240" },
       weightLimit: "Unlimited",
     },
   },
