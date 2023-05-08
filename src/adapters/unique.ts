@@ -17,6 +17,21 @@ import {
   TransferParams,
 } from "../types";
 
+export const uniqueRoutersConfig: Omit<RouteConfigs, "from">[] = [
+  {
+    to: "acala",
+    token: "UNQ",
+    xcm: {
+      fee: { token: "UNQ", amount: "101030000000000000" },
+      weightLimit: "Unlimited",
+    },
+  },
+];
+
+export const uniqueTokensConfig: Record<string, BasicToken> = {
+  UNQ: { name: "UNQ", symbol: "UNQ", decimals: 18, ed: "0" },
+};
+
 export const quartzRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
@@ -87,7 +102,7 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new UniqueBalanceAdapter({
       chain: this.chain.id as ChainId,
       api,
-      tokens: quartzTokensConfig,
+      tokens: this.tokens,
     });
   }
 
@@ -159,14 +174,46 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
 
-    const dst = { X2: ["Parent", { ParaChain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
-    const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
+    const dst = {
+      V3: {
+        parents: 1,
+        interior: {
+          X1: {
+            Parachain: toChain.paraChainId,
+          },
+        },
+      },
+    };
+    const acc = {
+      V3: {
+        parents: 0,
+        interior: {
+          X1: {
+            AccountId32: { id: accountId },
+          },
+        },
+      },
+    };
+    const ass = {
+      V3: [
+        {
+          id: {
+            Concrete: {
+              parents: 0,
+              interior: "Here",
+            },
+          },
+          fun: {
+            Fungible: amount.toChainData(),
+          },
+        },
+      ],
+    };
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V0: dst },
-      { V0: acc },
-      { V0: ass },
+      dst,
+      acc,
+      ass,
       0,
       this.getDestWeight(token, to)?.toString()
     );
@@ -176,5 +223,11 @@ class BaseUniqueAdapter extends BaseCrossChainAdapter {
 export class QuartzAdapter extends BaseUniqueAdapter {
   constructor() {
     super(chains.quartz, quartzRoutersConfig, quartzTokensConfig);
+  }
+}
+
+export class UniqueAdapter extends BaseUniqueAdapter {
+  constructor() {
+    super(chains.unique, uniqueRoutersConfig, uniqueTokensConfig);
   }
 }

@@ -16,7 +16,7 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound } from "../errors";
+import { ApiNotFound, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
@@ -24,6 +24,7 @@ import {
   TransferParams,
 } from "../types";
 import { isChainEqual } from "../utils/is-chain-equal";
+import { SUPPORTED_TOKENS as STATEMINE_SUPPORTED_TOKENS } from "./statemint";
 
 const ACALA_DEST_WEIGHT = "5000000000";
 
@@ -57,6 +58,14 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "AUSD",
     xcm: {
       fee: { token: "AUSD", amount: "2000000000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "moonbeam",
+    token: "DOT",
+    xcm: {
+      fee: { token: "DOT", amount: "447889166" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -141,14 +150,39 @@ export const acalaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
-    to: "hydra",
+    to: "hydradx",
     token: "DAI",
     xcm: {
       fee: { token: "DAI", amount: "2926334210356268" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
+  {
+    to: "hydradx",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "956965470918" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "hydradx",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "6" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "unique",
+    token: "UNQ",
+    xcm: {
+      fee: { token: "UNQ", amount: "" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
 ];
+
 export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "kusama",
@@ -162,7 +196,7 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "statemine",
     token: "RMRK",
     xcm: {
-      fee: { token: "KSM", amount: "16000000000" },
+      fee: { token: "RMRK", amount: "100000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -178,7 +212,15 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "statemine",
     token: "USDT",
     xcm: {
-      fee: { token: "KSM", amount: "16000000000" },
+      fee: { token: "USDT", amount: "1000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "calamari",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "25163" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -234,7 +276,7 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "altair",
     token: "AIR",
     xcm: {
-      fee: { token: "AIR", amount: "6400000000000000" },
+      fee: { token: "AIR", amount: "9269600000000000" },
       weightLimit: ACALA_DEST_WEIGHT,
     },
   },
@@ -559,6 +601,22 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
+    to: "basilisk",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "2926000000000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "basilisk",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "22" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "listen",
     token: "LT",
     xcm: {
@@ -623,6 +681,24 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: "10000000000000000",
   },
+  WETH: {
+    name: "WETH",
+    symbol: "WETH",
+    decimals: 18,
+    ed: "5555555555555",
+  },
+  WBTC: {
+    name: "WBTC",
+    symbol: "WBTC",
+    decimals: 8,
+    ed: "35",
+  },
+  UNQ: {
+    name: "Unique Network",
+    symbol: "UNQ",
+    decimals: 18,
+    ed: "1250000000000000000",
+  },
 };
 
 export const karuraTokensConfig: Record<string, BasicToken> = {
@@ -673,6 +749,18 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     symbol: "USDCet",
     decimals: 6,
     ed: "10000",
+  },
+  WETH: {
+    name: "WETH",
+    symbol: "WETH",
+    decimals: 18,
+    ed: "5555555555555",
+  },
+  WBTC: {
+    name: "WBTC",
+    symbol: "WBTC",
+    decimals: 8,
+    ed: "35",
   },
 };
 
@@ -792,7 +880,6 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
 
     const tokenFormSDK = this.wallet?.getToken(token);
     const toChain = chains[to];
-    const destFee = this.getCrossChainFee(token, to);
     const oldDestWeight = this.getDestWeight(token, to);
     const useNewDestWeight =
       this.api.tx.xTokens.transfer.meta.args[3].type.toString() ===
@@ -813,27 +900,12 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
         },
       };
 
-      return token === "KAR" ||
-        token === "KUSD" ||
-        token === "MOVR" ||
-        token === "ACA" ||
-        token === "AUSD" ||
-        token === "GLMR"
-        ? this.api.tx.xTokens.transfer(
-            tokenFormSDK?.toChainData() as any,
-            amount.toChainData(),
-            { V1: dst },
-            (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
-          )
-        : this.api.tx.xTokens.transferMulticurrencies(
-            [
-              [tokenFormSDK?.toChainData() as any, amount.toChainData()],
-              [{ Token: destFee.token }, destFee.balance.toChainData()],
-            ],
-            1,
-            { V1: dst },
-            (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
-          );
+      return this.api.tx.xTokens.transfer(
+        tokenFormSDK?.toChainData() as any,
+        amount.toChainData(),
+        { V1: dst },
+        (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
+      );
     }
 
     const accountId = this.api?.createType("AccountId32", address).toHex();
@@ -857,22 +929,64 @@ class BaseAcalaAdapter extends BaseCrossChainAdapter {
       };
     }
 
-    return isChainEqual(toChain, "statemine")
-      ? this.api.tx.xTokens.transferMulticurrencies(
-          [
-            [tokenFormSDK?.toChainData(), amount.toChainData()],
-            [{ Token: destFee.token }, destFee.balance.toChainData()],
-          ],
-          1,
-          { V1: dst },
-          (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
-        )
-      : this.api.tx.xTokens.transfer(
-          tokenFormSDK?.toChainData() as any,
-          amount.toChainData(),
-          { V1: dst },
-          (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
-        );
+    if (isChainEqual(toChain, "statemine")) {
+      const assetId = STATEMINE_SUPPORTED_TOKENS[token];
+
+      if (!assetId) {
+        throw new TokenNotFound(token);
+      }
+
+      const asset = {
+        V1: {
+          fun: {
+            Fungible: amount.toChainData(),
+          },
+          id: {
+            Concrete: {
+              parents: 1,
+              interior: {
+                X3: [
+                  { Parachain: toChain.paraChainId },
+                  { PalletInstance: 50 },
+                  { GeneralIndex: assetId },
+                ],
+              },
+            },
+          },
+        },
+      };
+      const dst = {
+        V1: {
+          parents: 1,
+          interior: {
+            X2: [
+              {
+                Parachain: toChain.paraChainId,
+              },
+              {
+                AccountId32: {
+                  network: "Any",
+                  id: accountId,
+                },
+              },
+            ],
+          },
+        },
+      };
+
+      return this.api.tx.xTokens.transferMultiasset(
+        asset,
+        dst,
+        (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
+      );
+    } else {
+      return this.api.tx.xTokens.transfer(
+        tokenFormSDK?.toChainData(),
+        amount.toChainData(),
+        { V1: dst },
+        (useNewDestWeight ? "Unlimited" : oldDestWeight?.toString()) as any
+      );
+    }
   }
 }
 

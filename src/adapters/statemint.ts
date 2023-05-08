@@ -23,7 +23,7 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "kusama",
     token: "KSM",
     xcm: {
-      fee: { token: "KSM", amount: "106666660" },
+      fee: { token: "KSM", amount: "90049287" },
       weightLimit: "Unlimited",
     },
   },
@@ -31,7 +31,7 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "karura",
     token: "RMRK",
     xcm: {
-      fee: { token: "RMRK", amount: "6400000" },
+      fee: { token: "RMRK", amount: "9918117" },
       weightLimit: "Unlimited",
     },
   },
@@ -46,7 +46,7 @@ export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
     to: "karura",
     token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "640" }, weightLimit: "Unlimited" },
+    xcm: { fee: { token: "USDT", amount: "808" }, weightLimit: "Unlimited" },
   },
   {
     to: "calamari",
@@ -67,7 +67,7 @@ export const statemineTokensConfig: Record<
   },
 };
 
-const SUPPORTED_TOKENS: Record<string, BN> = {
+export const SUPPORTED_TOKENS: Record<string, BN> = {
   RMRK: new BN(8),
   ARIS: new BN(16),
   USDT: new BN(1984),
@@ -202,7 +202,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       txFee:
         token === this.balanceAdapter?.nativeToken
           ? this.estimateTxFee({
-              amount: FN.ZERO,
+              amount: FN.ONE,
               to,
               token,
               address,
@@ -244,26 +244,29 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
 
     // to relay chain
     if (to === "kusama" || to === "polkadot") {
+      // to relay chain only support native token
       if (token !== this.balanceAdapter?.nativeToken) {
         throw new TokenNotFound(token);
       }
 
       const dst = { interior: "Here", parents: 1 };
       const acc = {
-        interior: { X1: { AccountId32: { id: accountId, network: "Any" } } },
+        interior: { X1: { AccountId32: { id: accountId } } },
         parents: 0,
       };
       const ass = [
         {
+          id: {
+            Concrete: { interior: "Here", parents: 1 },
+          },
           fun: { Fungible: amount.toChainData() },
-          id: { Concrete: { interior: "Here", parents: 1 } },
         },
       ];
 
       return this.api?.tx.polkadotXcm.limitedTeleportAssets(
-        { V1: dst },
-        { V1: acc },
-        { V1: ass },
+        { V3: dst },
+        { V3: acc },
+        { V3: ass },
         0,
         this.getDestWeight(token, to)?.toString()
       );
@@ -280,21 +283,34 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       throw new TokenNotFound(token);
     }
 
-    const dst = { X2: ["Parent", { Parachain: toChain.paraChainId }] };
-    const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+    const dst = {
+      parents: 1,
+      interior: { X1: { Parachain: toChain.paraChainId } },
+    };
+    const acc = {
+      parents: 0,
+      interior: { X1: { AccountId32: { id: accountId } } },
+    };
     const ass = [
       {
-        ConcreteFungible: {
-          id: { X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }] },
-          amount: amount.toChainData(),
+        id: {
+          Concrete: {
+            parents: 0,
+            interior: {
+              X2: [{ PalletInstance: 50 }, { GeneralIndex: assetId }],
+            },
+          },
+        },
+        fun: {
+          Fungible: amount.toChainData(),
         },
       },
     ];
 
     return this.api?.tx.polkadotXcm.limitedReserveTransferAssets(
-      { V0: dst },
-      { V0: acc },
-      { V0: ass },
+      { V3: dst },
+      { V3: acc },
+      { V3: ass },
       0,
       this.getDestWeight(token, to)?.toString()
     );
