@@ -217,6 +217,14 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
+    to: "calamari",
+    token: "USDT",
+    xcm: {
+      fee: { token: "USDT", amount: "25163" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "shiden",
     token: "SDN",
     xcm: {
