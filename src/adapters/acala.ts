@@ -225,6 +225,46 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
+    to: "calamari",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "89" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "calamari",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "13740430713451" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "calamari",
+    token: "BNB",
+    xcm: {
+      fee: { token: "BNB", amount: "81119080622803" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "calamari",
+    token: "BUSD",
+    xcm: {
+      fee: { token: "BUSD", amount: "25163950000000000" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
+    to: "calamari",
+    token: "ARB",
+    xcm: {
+      fee: { token: "ARB", amount: "21146176470588235" },
+      weightLimit: ACALA_DEST_WEIGHT,
+    },
+  },
+  {
     to: "shiden",
     token: "SDN",
     xcm: {
@@ -652,7 +692,7 @@ export const karuraRoutersConfig: Omit<RouteConfigs, "from">[] = [
     to: "quartz",
     token: "QTZ",
     xcm: { fee: { token: "QTZ", amount: "0" }, weightLimit: ACALA_DEST_WEIGHT },
-  },
+  }
 ];
 
 export const acalaTokensConfig: Record<string, BasicToken> = {
@@ -762,6 +802,24 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     decimals: 8,
     ed: "35",
   },
+  BNB: {
+    name: "BNB",
+    symbol: "BNB",
+    decimals: 18,
+    ed: "40000000000000",
+  },
+  BUSD: {
+    name: "BUSD",
+    symbol: "BUSD",
+    decimals: 18,
+    ed: "10000000000000000",
+  },
+  ARB: {
+    name: "ARB",
+    symbol: "ARB",
+    decimals: 18,
+    ed: "9000000000000000",
+  }
 };
 
 class BaseAcalaAdapter extends BaseCrossChainAdapter {
