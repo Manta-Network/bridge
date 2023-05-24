@@ -86,6 +86,46 @@ export const calamariRoutersConfig: Omit<RouteConfigs, "from">[] = [
     },
   },
   {
+    to: "karura",
+    token: "WBTC",
+    xcm: {
+      fee: { token: "WBTC", amount: "2" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "WETH",
+    xcm: {
+      fee: { token: "WETH", amount: "449022222222" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "BNB",
+    xcm: {
+      fee: { token: "BNB", amount: "3232960000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "BUSD",
+    xcm: {
+      fee: { token: "BUSD", amount: "808240000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: "karura",
+    token: "ARB",
+    xcm: {
+      fee: { token: "ARB", amount: "727416000000000" },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
     to: "kusama",
     token: "KSM",
     xcm: {
@@ -120,8 +160,12 @@ export const calamariTokensConfig: Record<string, BasicToken> = {
   MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "100000000000000000" },
   USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "10000" },
   DAI: { name: "DAI", symbol: "DAI", decimals: 18, ed: "10000000000000000" },
-  USDCet: { name: "USDCet", symbol: "USDCet", decimals: 6, ed: "10000" }
-
+  USDCet: { name: "USDCet", symbol: "USDCet", decimals: 6, ed: "10000" },
+  WETH: { name: "WETH", symbol: "WETH", decimals: 18, ed: "5555555555555" },
+  WBTC: { name: "WBTC", symbol: "WBTC", decimals: 8, ed: "35" },
+  BNB: { name: "BNB", symbol: "BNB", decimals: 18, ed: "40000000000000" },
+  BUSD: { name: "BUSD", symbol: "BUSD", decimals: 18, ed: "10000000000000000" },
+  ARB: { name: "ARB", symbol: "ARB", decimals: 18, ed: "9000000000000000"},
 };
 
 const SUPPORTED_TOKENS: Record<string, number> = {
@@ -133,7 +177,12 @@ const SUPPORTED_TOKENS: Record<string, number> = {
   KSM: 12,
   USDT: 14,
   DAI: 15,
-  USDCet: 16
+  USDCet: 16,
+  ARB: 17,
+  BNB: 21,
+  BUSD: 23,
+  WBTC: 26,
+  WETH: 27
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
