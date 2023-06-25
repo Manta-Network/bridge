@@ -9,13 +9,14 @@ import { ISubmittableResult } from "@polkadot/types/types";
 import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
 import { BaseCrossChainAdapter } from "../base-chain-adapter";
 import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
 import {
   BalanceData,
   BasicToken,
   RouteConfigs,
   TransferParams,
 } from "../types";
+import { validateAddress } from "../utils";
 
 export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
   {
@@ -48,6 +49,14 @@ export const kusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
     token: "KSM",
     xcm: {
       fee: { token: "KSM", amount: "5275240" },
+      weightLimit: "Unlimited",
+    },
+  },
+  {
+    to: "calamari",
+    token: "KSM",
+    xcm: {
+      fee: { token: "KSM", amount: "167728833" },
       weightLimit: "Unlimited",
     },
   },
@@ -122,6 +131,8 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     // fixme: should check `token !== this.nativeToken` instead
@@ -232,15 +243,16 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   ):
     | SubmittableExtrinsic<"promise", ISubmittableResult>
     | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
+
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const toChain = chains[to];
 
     // fixme: should check `token !== this.balanceAdapter?.nativeToken` instead
-    if (token !== 'KSM') {
+    if (token !== 'KSM' && token !== 'DOT') {
       throw new TokenNotFound(token);
     }
 

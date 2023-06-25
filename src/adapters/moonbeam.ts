@@ -1,48 +1,53 @@
-import { Storage } from "@acala-network/sdk/utils/storage";
-import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
-import { combineLatest, from, map, Observable } from "rxjs";
-import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
-import { BalanceData, BasicToken, TransferParams, RouteConfigs } from "../types";
-import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
-import { ISubmittableResult } from "@polkadot/types/types";
-import { BN } from "@polkadot/util";
+import { Storage } from '@acala-network/sdk/utils/storage';
+import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
+import { combineLatest, from, map, Observable } from 'rxjs';
+import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { BaseCrossChainAdapter } from '../base-chain-adapter';
+import { ChainId, chains } from '../configs';
+import { ApiNotFound, TokenNotFound } from '../errors';
+import {
+  BalanceData,
+  BasicToken,
+  TransferParams,
+  RouteConfigs,
+} from '../types';
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
+import { ISubmittableResult } from '@polkadot/types/types';
+import { BN } from '@polkadot/util';
 
-export const moonriverRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const moonriverRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   {
-    to: "calamari",
-    token: "MOVR",
+    to: 'calamari',
+    token: 'MOVR',
     xcm: {
-      fee: { token: "MOVR", amount: "503025000000000" },
-      weightLimit: "Unlimited",
+      fee: { token: 'MOVR', amount: '503025000000000' },
+      weightLimit: 'Unlimited',
     },
-  }
+  },
 ];
 
 export const moonbeamTokensConfig: Record<string, BasicToken> = {
   GLMR: {
-    name: "GLMR",
-    symbol: "GLMR",
+    name: 'GLMR',
+    symbol: 'GLMR',
     decimals: 18,
-    ed: "100000000000000000",
+    ed: '100000000000000000',
   },
-  ACA: { name: "ACA", symbol: "ACA", decimals: 12, ed: "100000000000" },
-  AUSD: { name: "AUSD", symbol: "AUSD", decimals: 12, ed: "100000000000" },
-  LDOT: { name: "LDOT", symbol: "LDOT", decimals: 10, ed: "500000000" },
-  DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
+  ACA: { name: 'ACA', symbol: 'ACA', decimals: 12, ed: '100000000000' },
+  AUSD: { name: 'AUSD', symbol: 'AUSD', decimals: 12, ed: '100000000000' },
+  LDOT: { name: 'LDOT', symbol: 'LDOT', decimals: 10, ed: '500000000' },
+  DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: '10000000000' },
 };
 
 export const moonriverTokensConfig: Record<string, BasicToken> = {
-  MOVR: { name: "MOVR", symbol: "MOVR", decimals: 18, ed: "1000000000000000" },
-  KAR: { name: "KAR", symbol: "KAR", decimals: 12, ed: "0" },
-  KUSD: { name: "KUSD", symbol: "KUSD", decimals: 12, ed: "0" },
+  MOVR: { name: 'MOVR', symbol: 'MOVR', decimals: 18, ed: '1000000000000000' },
+  KAR: { name: 'KAR', symbol: 'KAR', decimals: 12, ed: '0' },
+  KUSD: { name: 'KUSD', symbol: 'KUSD', decimals: 12, ed: '0' },
 };
 
 const SUPPORTED_TOKENS: Record<string, string> = {
-  MOVR: "MOVR"
+  MOVR: 'MOVR',
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -51,13 +56,13 @@ const createBalanceStorages = (api: AnyApi) => {
     balances: (address: string) =>
       Storage.create<DeriveBalancesAll>({
         api,
-        path: "derive.balances.all",
+        path: 'derive.balances.all',
         params: [address],
       }),
     assets: (tokenId: string, address: string) =>
       Storage.create<any>({
         api,
-        path: "query.assets.account",
+        path: 'query.assets.account',
         params: [tokenId, address],
       }),
   };
@@ -103,7 +108,7 @@ class MoonbeamBalanceAdapter extends BalanceAdapter {
     return this.storages.assets(address, tokenId).observable.pipe(
       map((balance) => {
         const amount = FN.fromInner(
-          balance.free?.toString() || "0",
+          balance.free?.toString() || '0',
           this.getToken(tokenId).decimals
         );
 
@@ -117,7 +122,6 @@ class MoonbeamBalanceAdapter extends BalanceAdapter {
     );
   }
 }
-
 
 class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
   private balanceAdapter?: MoonbeamBalanceAdapter;
@@ -134,8 +138,10 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
     });
   }
 
-
-  public subscribeTokenBalance(token: string, address: string): Observable<BalanceData> {
+  public subscribeTokenBalance(
+    token: string,
+    address: string
+  ): Observable<BalanceData> {
     if (!this.balanceAdapter) {
       throw new ApiNotFound(this.chain.id);
     }
@@ -162,7 +168,7 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
               address,
               signer: address,
             })
-          : "0",
+          : '0',
       balance: this.balanceAdapter
         .subscribeBalance(token, address)
         .pipe(map((i) => i.available)),
@@ -177,33 +183,32 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
         // always minus ed
         return balance
           .minus(fee)
-          .minus(FN.fromInner(tokenMeta?.ed || "0", tokenMeta?.decimals));
+          .minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
-    )};
-
-    public override estimateTxFee(_: TransferParams): Observable<string> {
-      const MOONBEAM_XCM_GAS = new BN(35697);
-      return from(
-        (async () => {
-          const baseFee: any = await this.api?.rpc.eth.gasPrice();
-          const minFee = baseFee.mul(MOONBEAM_XCM_GAS);
-          // Metamask default fee is minFee * 1.5
-          const mediumFee = minFee.mul(new BN(3)).div(new BN(2));
-          return mediumFee.toString();
-        })()
-      );
-
-    }
-
-    public createTx(
-      _: TransferParams
-    ):
-      | SubmittableExtrinsic<"promise", ISubmittableResult>
-      | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-      throw new ApiNotFound(this.chain.id);
-    }
+    );
   }
 
+  public override estimateTxFee(_: TransferParams): Observable<string> {
+    const MOONBEAM_XCM_GAS = new BN(35697);
+    return from(
+      (async () => {
+        const baseFee: any = await this.api?.rpc.eth.gasPrice();
+        const minFee = baseFee.mul(MOONBEAM_XCM_GAS);
+        // Metamask default fee is minFee * 1.5
+        const mediumFee = minFee.mul(new BN(3)).div(new BN(2));
+        return mediumFee.toString();
+      })()
+    );
+  }
+
+  public createTx(
+    _: TransferParams
+  ):
+    | SubmittableExtrinsic<'promise', ISubmittableResult>
+    | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+    throw new ApiNotFound(this.chain.id);
+  }
+}
 export class MoonbeamAdapter extends BaseMoonbeamAdapter {
   constructor() {
     super(chains.moonbeam, [], moonbeamTokensConfig);
@@ -212,6 +217,6 @@ export class MoonbeamAdapter extends BaseMoonbeamAdapter {
 
 export class MoonriverAdapter extends BaseMoonbeamAdapter {
   constructor() {
-    super(chains.moonriver, moonriverRoutersConfig, moonriverTokensConfig);
+    super(chains.moonriver, [], moonriverTokensConfig);
   }
 }

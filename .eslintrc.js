@@ -28,7 +28,6 @@ module.exports = {
   },
   rules: {
     ...base.rules,
-    'quotes': 'double',
     '@typescript-eslint/no-explicit-any': 'off',
     'react/prop-types': 'off',
     'header/header': 'off',
