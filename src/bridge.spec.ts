@@ -45,7 +45,7 @@ describe.skip('Bridge sdk usage', () => {
 
     expect(provider.getApi(chains[0])).toEqual(undefined);
     expect(provider.getApi(chains[1])).toEqual(undefined);
-
+  
     // connect all adapters
     const connected = await firstValueFrom(provider.connectFromChain(chains, undefined));
     // and set apiProvider for each adapter

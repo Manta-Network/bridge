@@ -1,58 +1,59 @@
-import { Storage } from "@acala-network/sdk/utils/storage";
-import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
-import { combineLatest, map, Observable } from "rxjs";
+import { Storage } from '@acala-network/sdk/utils/storage';
+import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable } from 'rxjs';
 
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
-import { ISubmittableResult } from "@polkadot/types/types";
-import { BN } from "@polkadot/util";
+import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+import { ISubmittableResult } from '@polkadot/types/types';
+import { BN } from '@polkadot/util';
 
-import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
-import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainId, chains } from "../configs";
-import { ApiNotFound, TokenNotFound } from "../errors";
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
+import { BaseCrossChainAdapter } from '../base-chain-adapter';
+import { ChainId, chains } from '../configs';
+import { ApiNotFound, InvalidAddress, TokenNotFound } from '../errors';
 import {
   BalanceData,
   BasicToken,
   RouteConfigs,
   TransferParams,
-} from "../types";
+} from '../types';
+import { validateAddress } from '../utils';
 
-export const statemineRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const statemineRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   {
-    to: "kusama",
-    token: "KSM",
+    to: 'kusama',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "90049287" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '90049287' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "karura",
-    token: "RMRK",
+    to: 'karura',
+    token: 'RMRK',
     xcm: {
-      fee: { token: "RMRK", amount: "9918117" },
-      weightLimit: "Unlimited",
+      fee: { token: 'RMRK', amount: '9918117' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "karura",
-    token: "ARIS",
+    to: 'karura',
+    token: 'ARIS',
     xcm: {
-      fee: { token: "ARIS", amount: "6400000" },
-      weightLimit: "Unlimited",
+      fee: { token: 'ARIS', amount: '6400000' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "karura",
-    token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "808" }, weightLimit: "Unlimited" },
+    to: 'karura',
+    token: 'USDT',
+    xcm: { fee: { token: 'USDT', amount: '808' }, weightLimit: 'Unlimited' },
   },
   {
-    to: "calamari",
-    token: "USDT",
-    xcm: { fee: { token: "USDT", amount: "25159" }, weightLimit: "Unlimited" },
-  }
+    to: 'calamari',
+    token: 'USDT',
+    xcm: { fee: { token: 'USDT', amount: '25159' }, weightLimit: 'Unlimited' },
+  },
 ];
 
 export const statemineTokensConfig: Record<
@@ -60,10 +61,10 @@ export const statemineTokensConfig: Record<
   Record<string, BasicToken>
 > = {
   statemine: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "79999999" },
-    RMRK: { name: "RMRK", symbol: "RMRK", decimals: 10, ed: "100000000" },
-    ARIS: { name: "ARIS", symbol: "ARIS", decimals: 8, ed: "10000000" },
-    USDT: { name: "USDT", symbol: "USDT", decimals: 6, ed: "1000" },
+    KSM: { name: 'KSM', symbol: 'KSM', decimals: 12, ed: '79999999' },
+    RMRK: { name: 'RMRK', symbol: 'RMRK', decimals: 10, ed: '100000000' },
+    ARIS: { name: 'ARIS', symbol: 'ARIS', decimals: 8, ed: '10000000' },
+    USDT: { name: 'USDT', symbol: 'USDT', decimals: 6, ed: '1000' },
   },
 };
 
@@ -79,25 +80,25 @@ const createBalanceStorages = (api: AnyApi) => {
     balances: (address: string) =>
       Storage.create<DeriveBalancesAll>({
         api,
-        path: "derive.balances.all",
+        path: 'derive.balances.all',
         params: [address],
       }),
     assets: (assetId: BN, address: string) =>
       Storage.create<any>({
         api,
-        path: "query.assets.account",
+        path: 'query.assets.account',
         params: [assetId, address],
       }),
     assetsMeta: (assetId: BN) =>
       Storage.create<any>({
         api,
-        path: "query.assets.metadata",
+        path: 'query.assets.metadata',
         params: [assetId],
       }),
     assetsInfo: (assetId: BN) =>
       Storage.create<any>({
         api,
-        path: "query.assets.asset",
+        path: 'query.assets.asset',
         params: [assetId],
       }),
   };
@@ -115,6 +116,8 @@ class StatemintBalanceAdapter extends BalanceAdapter {
     token: string,
     address: string
   ): Observable<BalanceData> {
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const storage = this.storages.balances(address);
 
     if (token === this.nativeToken) {
@@ -146,7 +149,7 @@ class StatemintBalanceAdapter extends BalanceAdapter {
     }).pipe(
       map(({ balance, meta }) => {
         const amount = FN.fromInner(
-          balance.unwrapOrDefault()?.balance?.toString() || "0",
+          balance.unwrapOrDefault()?.balance?.toString() || '0',
           meta.decimals?.toNumber()
         );
 
@@ -208,7 +211,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
               address,
               signer: address,
             })
-          : "0",
+          : '0',
       balance: this.balanceAdapter
         .subscribeBalance(token, address)
         .pipe(map((i) => i.available)),
@@ -223,7 +226,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
         // always minus ed
         return balance
           .minus(fee)
-          .minus(FN.fromInner(tokenMeta?.ed || "0", tokenMeta?.decimals));
+          .minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -231,25 +234,26 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
   public createTx(
     params: TransferParams
   ):
-    | SubmittableExtrinsic<"promise", ISubmittableResult>
-    | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
-    if (this.api === undefined) {
-      throw new ApiNotFound(this.chain.id);
-    }
+    | SubmittableExtrinsic<'promise', ISubmittableResult>
+    | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
+    if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
+
+    if (!validateAddress(address)) throw new InvalidAddress(address);
+
     const toChain = chains[to];
 
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api?.createType('AccountId32', address).toHex();
 
     // to relay chain
-    if (to === "kusama" || to === "polkadot") {
+    if (to === 'kusama' || to === 'polkadot') {
       // to relay chain only support native token
       if (token !== this.balanceAdapter?.nativeToken) {
         throw new TokenNotFound(token);
       }
 
-      const dst = { interior: "Here", parents: 1 };
+      const dst = { interior: 'Here', parents: 1 };
       const acc = {
         interior: { X1: { AccountId32: { id: accountId } } },
         parents: 0,
@@ -257,7 +261,7 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       const ass = [
         {
           id: {
-            Concrete: { interior: "Here", parents: 1 },
+            Concrete: { interior: 'Here', parents: 1 },
           },
           fun: { Fungible: amount.toChainData() },
         },
@@ -272,12 +276,11 @@ class BaseStatemintAdapter extends BaseCrossChainAdapter {
       );
     }
 
-    // to karura / acala / calamari
+    // to karura/acala
     const assetId = SUPPORTED_TOKENS[token];
 
     if (
-      (to !== "acala" && to !== "karura" && to !== "calamari") ||
-      token === this.balanceAdapter?.nativeToken ||
+      (to !== 'calamari' && token === this.balanceAdapter?.nativeToken) ||
       !assetId
     ) {
       throw new TokenNotFound(token);
