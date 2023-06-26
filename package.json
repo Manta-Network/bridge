@@ -1,6 +1,6 @@
 {
   "name": "manta-polkawallet-bridge",
-  "version": "0.6.0",
+  "version": "0.6.0-dev12",
   "description": "polkawallet bridge sdk",
   "main": "index.js",
   "types": "index.d.ts",
@@ -31,7 +31,7 @@
     "rxjs": "^7.5.7"
   },
   "dependencies": {
-    "@acala-network/api": "^4.1.8-14",
+    "@acala-network/api": "^5.0.2",
     "@acala-network/sdk": "^4.1.8-14",
     "@acala-network/sdk-core": "^4.1.8-14",
     "@polkadot/apps-config": "^0.127.1",

@@ -217,6 +217,6 @@ export class MoonbeamAdapter extends BaseMoonbeamAdapter {
 
 export class MoonriverAdapter extends BaseMoonbeamAdapter {
   constructor() {
-    super(chains.moonriver, [], moonriverTokensConfig);
+    super(chains.moonriver, moonriverRoutersConfig, moonriverTokensConfig);
   }
 }
