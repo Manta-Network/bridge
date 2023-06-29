@@ -153,6 +153,200 @@ export const calamariRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
 ];
 
+export const mantaRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
+  {
+    to: 'polkadot',
+    token: 'DOT',
+    xcm: {
+      fee: { token: 'DOT', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'moonbeam',
+    token: 'GLMR',
+    xcm: {
+      fee: { token: 'GLMR', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'acala',
+    token: 'ACA',
+    xcm: {
+      fee: { token: 'ACA', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'acala',
+    token: 'DAI',
+    xcm: {
+      fee: { token: 'DAI', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'acala',
+    token: 'USDT',
+    xcm: {
+      fee: { token: 'USDT', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'acala',
+    token: 'USDCet',
+    xcm: {
+      fee: { token: 'USDCet', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'acala',
+    token: 'WETH',
+    xcm: {
+      fee: { token: 'WETH', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'acala',
+    token: 'WBTC',
+    xcm: {
+      fee: { token: 'WBTC', amount: '0' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+];
+
+// todo: check these existential deposit values
+export const mantaTokensConfig: Record<string, ExtendedToken> = {
+  MANTA: {
+    name: 'MANTA',
+    symbol: 'MANTA',
+    decimals: 18,
+    ed: '100000000000000000',
+    toRaw: () => ({ MantaCurrency: 1 }),
+  },
+  DOT: {
+    name: 'DOT',
+    symbol: 'DOT',
+    decimals: 10,
+    ed: '10000000000',
+    toRaw: () => ({ MantaCurrency: 8 }),
+  },
+  USDT: {
+    name: 'USDT',
+    symbol: 'USDT',
+    decimals: 6,
+    ed: '10000',
+    toRaw: () => ({ MantaCurrency: 9 }),
+  },
+  GLMR: {
+    name: 'GLMR',
+    symbol: 'GLMR',
+    decimals: 18,
+    ed: '100000000000000000',
+    toRaw: () => ({ MantaCurrency: 10 }),
+  },
+  ACA: {
+    name: 'ACA',
+    symbol: 'ACA',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 11 }),
+  },
+
+  // just registered
+  LDOT: {
+    name: 'LDOT',
+    symbol: 'LDOT',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 12 }),
+  },
+  ARB: {
+    name: 'ARB',
+    symbol: 'ARB',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 13 }),
+  },
+  BUSD: {
+    name: 'BUSD',
+    symbol: 'BUSD',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 14 }),
+  },
+  LIDO: {
+    name: 'LIDO',
+    symbol: 'LIDO',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 15 }),
+  },
+  SHIB: {
+    name: 'SHIB',
+    symbol: 'SHIB',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 16 }),
+  },
+  UNI: {
+    name: 'UNI',
+    symbol: 'UNI',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 17 }),
+  },
+  LINK: {
+    name: 'LINK',
+    symbol: 'LINK',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 18 }),
+  },
+  APE: {
+    name: 'APE',
+    symbol: 'APE',
+    decimals: 12,
+    ed: '100000000000',
+    toRaw: () => ({ MantaCurrency: 19 }),
+  },
+
+  // not registered yet
+  DAI: {
+    name: 'DAI',
+    symbol: 'DAI',
+    decimals: 18,
+    ed: '10000000000000000',
+    toRaw: () => ({ MantaCurrency: 888 }),
+  },
+  USDCet: {
+    name: 'USDCet',
+    symbol: 'USDCet',
+    decimals: 6,
+    ed: '10000',
+    toRaw: () => ({ MantaCurrency: 666 }),
+  },
+  WETH: {
+    name: 'WETH',
+    symbol: 'WETH',
+    decimals: 18,
+    ed: '5555555555555',
+    toRaw: () => ({ MantaCurrency: 444 }),
+  },
+  WBTC: {
+    name: 'WBTC',
+    symbol: 'WBTC',
+    decimals: 8,
+    ed: '35',
+    toRaw: () => ({ MantaCurrency: 555 }),
+  },
+};
+
 export const calamariTokensConfig: Record<string, ExtendedToken> = {
   KMA: {
     name: 'KMA',
@@ -338,7 +532,7 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
     this.balanceAdapter = new MantaBalanceAdapter({
       chain: this.chain.id as ChainId,
       api,
-      tokens: calamariTokensConfig,
+      tokens: this.tokens,
     });
   }
 
@@ -435,5 +629,11 @@ class BaseMantaAdapter extends BaseCrossChainAdapter {
 export class CalamariAdapter extends BaseMantaAdapter {
   constructor() {
     super(chains.calamari, calamariRoutersConfig, calamariTokensConfig);
+  }
+}
+
+export class MantaAdapter extends BaseMantaAdapter {
+  constructor() {
+    super(chains.manta, mantaRoutersConfig, mantaTokensConfig);
   }
 }

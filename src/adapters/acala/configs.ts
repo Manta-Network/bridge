@@ -134,6 +134,55 @@ export const acalaRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
       fee: { token: 'UNQ', amount: '' },
     },
   },
+  {
+    to: 'manta',
+    token: 'ACA',
+    xcm: {
+      fee: { token: 'ACA', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'DAI',
+    xcm: {
+      fee: { token: 'DAI', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'USDT',
+    xcm: {
+      fee: { token: 'USDT', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'USDCet',
+    xcm: {
+      fee: { token: 'USDCet', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'WBTC',
+    xcm: {
+      fee: { token: 'WBTC', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'WETH',
+    xcm: {
+      fee: { token: 'WETH', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'DOT',
+    xcm: {
+      fee: { token: 'DOT', amount: '0' },
+    },
+  },
 ];
 
 export const karuraRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
@@ -629,6 +678,15 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: '1250000000000000000',
   },
+  // todo: check existential deposit values
+  MANTA: {
+    name: 'MANTA',
+    symbol: 'MANTA',
+    decimals: 18,
+    ed: '100000000000000000',
+  },
+  USDT: { name: 'USDT', symbol: 'USDT', decimals: 6, ed: '10000' },
+  USDCet: { name: 'USDCet', symbol: 'USDCet', decimals: 6, ed: '10000' },
 };
 
 export const karuraTokensConfig: Record<string, BasicToken> = {

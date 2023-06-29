@@ -1,108 +1,113 @@
-import { Storage } from "@acala-network/sdk/utils/storage";
-import { AnyApi, FixedPointNumber as FN } from "@acala-network/sdk-core";
-import { combineLatest, map, Observable } from "rxjs";
+import { Storage } from '@acala-network/sdk/utils/storage';
+import { AnyApi, FixedPointNumber as FN } from '@acala-network/sdk-core';
+import { combineLatest, map, Observable } from 'rxjs';
 
-import { SubmittableExtrinsic } from "@polkadot/api/types";
-import { DeriveBalancesAll } from "@polkadot/api-derive/balances/types";
-import { ISubmittableResult } from "@polkadot/types/types";
+import { SubmittableExtrinsic } from '@polkadot/api/types';
+import { DeriveBalancesAll } from '@polkadot/api-derive/balances/types';
+import { ISubmittableResult } from '@polkadot/types/types';
 
-import { BalanceAdapter, BalanceAdapterConfigs } from "../balance-adapter";
-import { BaseCrossChainAdapter } from "../base-chain-adapter";
-import { ChainId, chains } from "../configs";
-import { ApiNotFound, InvalidAddress, TokenNotFound } from "../errors";
+import { BalanceAdapter, BalanceAdapterConfigs } from '../balance-adapter';
+import { BaseCrossChainAdapter } from '../base-chain-adapter';
+import { ChainId, chains } from '../configs';
+import { ApiNotFound, InvalidAddress, TokenNotFound } from '../errors';
 import {
   BalanceData,
   BasicToken,
   RouteConfigs,
   TransferParams,
-} from "../types";
-import { validateAddress } from "../utils";
+} from '../types';
+import { validateAddress } from '../utils';
 
-export const polkadotRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const polkadotRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   {
-    to: "acala",
-    token: "DOT",
-    xcm: { fee: { token: "DOT", amount: "3549633" }, weightLimit: "Unlimited" },
+    to: 'acala',
+    token: 'DOT',
+    xcm: { fee: { token: 'DOT', amount: '3549633' }, weightLimit: 'Unlimited' },
+  },
+  {
+    to: 'manta',
+    token: 'DOT',
+    xcm: { fee: { token: 'DOT', amount: '0' }, weightLimit: 'Unlimited' },
   },
 ];
 
 // TODO: should remove after kusama upgrade
-export const kusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const kusamaRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   {
-    to: "karura",
-    token: "KSM",
+    to: 'karura',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "71927964" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '71927964' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "basilisk",
-    token: "KSM",
+    to: 'basilisk',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "51618187" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '51618187' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "statemine",
-    token: "KSM",
+    to: 'statemine',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "5275240" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '5275240' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "calamari",
-    token: "KSM",
+    to: 'calamari',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "167728833" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '167728833' },
+      weightLimit: 'Unlimited',
     },
   },
 ];
 
-export const V3KusamaRoutersConfig: Omit<RouteConfigs, "from">[] = [
+export const V3KusamaRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   {
-    to: "karura",
-    token: "KSM",
+    to: 'karura',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "44163610" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '44163610' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "basilisk",
-    token: "KSM",
+    to: 'basilisk',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "72711796" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '72711796' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "statemine",
-    token: "KSM",
+    to: 'statemine',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "34368318" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '34368318' },
+      weightLimit: 'Unlimited',
     },
   },
   {
-    to: "calamari",
-    token: "KSM",
+    to: 'calamari',
+    token: 'KSM',
     xcm: {
-      fee: { token: "KSM", amount: "167728833" },
-      weightLimit: "Unlimited",
+      fee: { token: 'KSM', amount: '167728833' },
+      weightLimit: 'Unlimited',
     },
   },
 ];
 
 const polkadotTokensConfig: Record<string, Record<string, BasicToken>> = {
   polkadot: {
-    DOT: { name: "DOT", symbol: "DOT", decimals: 10, ed: "10000000000" },
+    DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: '10000000000' },
   },
   kusama: {
-    KSM: { name: "KSM", symbol: "KSM", decimals: 12, ed: "79999999" },
+    KSM: { name: 'KSM', symbol: 'KSM', decimals: 12, ed: '79999999' },
   },
 };
 
@@ -112,7 +117,7 @@ const createBalanceStorages = (api: AnyApi) => {
     balances: (address: string) =>
       Storage.create<DeriveBalancesAll>({
         api,
-        path: "derive.balances.all",
+        path: 'derive.balances.all',
         params: [address],
       }),
   };
@@ -136,7 +141,7 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
     const storage = this.storages.balances(address);
 
     // fixme: should check `token !== this.nativeToken` instead
-    if (token !==  'KSM') {
+    if (token !== 'KSM' && token !== 'DOT') {
       throw new TokenNotFound(token);
     }
 
@@ -172,7 +177,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     // TODO: should remove after kusama upgrade
     // update routers config when the chain is not support V0, V1 xcm message
-    if (!this.isV0V1 && chain === "kusama") {
+    if (!this.isV0V1 && chain === 'kusama') {
       this.routers = V3KusamaRoutersConfig;
     }
   }
@@ -219,7 +224,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
         // always minus ed
         return balance
           .minus(fee)
-          .minus(FN.fromInner(tokenMeta?.ed || "0", tokenMeta?.decimals));
+          .minus(FN.fromInner(tokenMeta?.ed || '0', tokenMeta?.decimals));
       })
     );
   }
@@ -227,10 +232,10 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   // TODO: should remove after kusama upgrade
   private get isV0V1() {
     try {
-      const keys = (this.api?.createType("XcmVersionedMultiLocation") as any)
+      const keys = (this.api?.createType('XcmVersionedMultiLocation') as any)
         .defKeys as string[];
 
-      return keys.includes("V0");
+      return keys.includes('V0');
     } catch (e) {
       // ignore error
     }
@@ -241,8 +246,8 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
   public createTx(
     params: TransferParams
   ):
-    | SubmittableExtrinsic<"promise", ISubmittableResult>
-    | SubmittableExtrinsic<"rxjs", ISubmittableResult> {
+    | SubmittableExtrinsic<'promise', ISubmittableResult>
+    | SubmittableExtrinsic<'rxjs', ISubmittableResult> {
     if (!this.api) throw new ApiNotFound(this.chain.id);
 
     const { address, amount, to, token } = params;
@@ -257,10 +262,10 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
     }
 
     const isV0V1Support = this.isV0V1;
-    const accountId = this.api?.createType("AccountId32", address).toHex();
+    const accountId = this.api?.createType('AccountId32', address).toHex();
 
     // to statemine
-    if (to === "statemine" || to === "statemint") {
+    if (to === 'statemine' || to === 'statemint') {
       const dst = {
         interior: { X1: { ParaChain: toChain.paraChainId } },
         parents: 0,
@@ -270,7 +275,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
           X1: {
             AccountId32: {
               id: accountId,
-              network: isV0V1Support ? "Any" : undefined,
+              network: isV0V1Support ? 'Any' : undefined,
             },
           },
         },
@@ -279,23 +284,23 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       const ass = [
         {
           fun: { Fungible: amount.toChainData() },
-          id: { Concrete: { interior: "Here", parents: 0 } },
+          id: { Concrete: { interior: 'Here', parents: 0 } },
         },
       ];
 
       return this.api?.tx.xcmPallet.limitedTeleportAssets(
-        { [isV0V1Support ? "V1" : "V3"]: dst },
-        { [isV0V1Support ? "V1" : "V3"]: acc },
-        { [isV0V1Support ? "V1" : "V3"]: ass },
+        { [isV0V1Support ? 'V1' : 'V3']: dst },
+        { [isV0V1Support ? 'V1' : 'V3']: acc },
+        { [isV0V1Support ? 'V1' : 'V3']: ass },
         0,
-        "Unlimited"
+        'Unlimited'
       );
     }
 
     // to acala or karura which is support V0/V1 (old version)
-    if ((to === "acala" || to === "karura") && isV0V1Support) {
+    if ((to === 'acala' || to === 'karura') && isV0V1Support) {
       const dst = { X1: { Parachain: toChain.paraChainId } };
-      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+      const acc = { X1: { AccountId32: { id: accountId, network: 'Any' } } };
       const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
 
       return this.api?.tx.xcmPallet.reserveTransferAssets(
@@ -308,7 +313,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
 
     if (isV0V1Support) {
       const dst = { X1: { Parachain: toChain.paraChainId } };
-      const acc = { X1: { AccountId32: { id: accountId, network: "Any" } } };
+      const acc = { X1: { AccountId32: { id: accountId, network: 'Any' } } };
       const ass = [{ ConcreteFungible: { amount: amount.toChainData() } }];
 
       return this.api?.tx.xcmPallet.limitedReserveTransferAssets(
@@ -331,7 +336,7 @@ class BasePolkadotAdapter extends BaseCrossChainAdapter {
       };
       const ass = [
         {
-          id: { Concrete: { parents: 0, interior: "Here" } },
+          id: { Concrete: { parents: 0, interior: 'Here' } },
           fun: { Fungible: amount.toChainData() },
         },
       ];
