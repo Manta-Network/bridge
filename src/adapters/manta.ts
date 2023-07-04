@@ -128,6 +128,54 @@ export const calamariRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
     },
   },
   {
+    to: 'karura',
+    token: 'MATIC',
+    xcm: {
+      fee: { token: 'MATIC', amount: '801280000000000' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'karura',
+    token: 'LDO',
+    xcm: {
+      fee: { token: 'LDO', amount: '400640000000000' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'karura',
+    token: 'SHIB',
+    xcm: {
+      fee: { token: 'SHIB', amount: '80128000000000000000' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'karura',
+    token: 'UNI',
+    xcm: {
+      fee: { token: 'UNI', amount: '160256000000000' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'karura',
+    token: 'LINK',
+    xcm: {
+      fee: { token: 'LINK', amount: '160256000000000' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
+    to: 'karura',
+    token: 'APE',
+    xcm: {
+      fee: { token: 'APE', amount: '240384000000000' },
+      weightLimit: DEST_WEIGHT,
+    },
+  },
+  {
     to: 'kusama',
     token: 'KSM',
     xcm: {
@@ -251,6 +299,48 @@ export const calamariTokensConfig: Record<string, ExtendedToken> = {
     decimals: 18,
     ed: '9000000000000000',
     toRaw: () => ({ MantaCurrency: 17 }),
+  },
+  MATIC: {
+    name: 'MATIC',
+    symbol: 'MATIC',
+    decimals: 18,
+    ed: '10000000000000000',
+    toRaw: () => ({ MantaCurrency: 20 }),
+  },
+  LDO: {
+    name: 'LDO',
+    symbol: 'LDO',
+    decimals: 18,
+    ed: '5000000000000000',
+    toRaw: () => ({ MantaCurrency: 18 }),
+  },
+  SHIB: {
+    name: 'SHIB',
+    symbol: 'SHIB',
+    decimals: 18,
+    ed: '1000000000000000000000',
+    toRaw: () => ({ MantaCurrency: 19 }),
+  },
+  UNI: {
+    name: 'UNI',
+    symbol: 'UNI',
+    decimals: 18,
+    ed: '2000000000000000',
+    toRaw: () => ({ MantaCurrency: 22 }),
+  },
+  LINK: {
+    name: 'LINK',
+    symbol: 'LINK',
+    decimals: 18,
+    ed: '2000000000000000',
+    toRaw: () => ({ MantaCurrency: 24 }),
+  },
+  APE: {
+    name: 'APE',
+    symbol: 'APE',
+    decimals: 18,
+    ed: '3000000000000000',
+    toRaw: () => ({ MantaCurrency: 25 }),
   },
 };
 

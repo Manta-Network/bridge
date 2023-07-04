@@ -404,6 +404,48 @@ export const karuraRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
     },
   },
   {
+    to: 'calamari',
+    token: 'MATIC',
+    xcm: {
+      fee: { token: 'MATIC', amount: '22745833333333333' },
+    },
+  },
+  {
+    to: 'calamari',
+    token: 'LDO',
+    xcm: {
+      fee: { token: 'LDO', amount: '10347489754098360' },
+    },
+  },
+  {
+    to: 'calamari',
+    token: 'SHIB',
+    xcm: {
+      fee: { token: 'SHIB', amount: '2199292247386759581881' },
+    },
+  },
+  {
+    to: 'calamari',
+    token: 'UNI',
+    xcm: {
+      fee: { token: 'UNI', amount: '4193999169435215' },
+    },
+  },
+  {
+    to: 'calamari',
+    token: 'LINK',
+    xcm: {
+      fee: { token: 'LINK', amount: '3435085034013605' },
+    },
+  },
+  {
+    to: 'calamari',
+    token: 'APE',
+    xcm: {
+      fee: { token: 'APE', amount: '5871598837209302' },
+    },
+  },
+  {
     to: 'moonriver',
     token: 'MOVR',
     xcm: {
@@ -709,5 +751,42 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     symbol: 'ARB',
     decimals: 18,
     ed: '9000000000000000',
+  },
+  MATIC: {
+    name: 'MATIC',
+    symbol: 'MATIC',
+    decimals: 18,
+    ed: '10000000000000000',
+  },
+
+  LDO: {
+    name: 'LDO',
+    symbol: 'LDO',
+    decimals: 18,
+    ed: '5000000000000000',
+  },
+  SHIB: {
+    name: 'SHIB',
+    symbol: 'SHIB',
+    decimals: 18,
+    ed: '1000000000000000000000',
+  },
+  UNI: {
+    name: 'UNI',
+    symbol: 'UNI',
+    decimals: 18,
+    ed: '2000000000000000',
+  },
+  LINK: {
+    name: 'LINK',
+    symbol: 'LINK',
+    decimals: 18,
+    ed: '2000000000000000',
+  },
+  APE: {
+    name: 'APE',
+    symbol: 'APE',
+    decimals: 18,
+    ed: '3000000000000000',
   },
 };
