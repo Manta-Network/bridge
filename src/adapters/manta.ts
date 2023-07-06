@@ -129,9 +129,9 @@ export const calamariRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
   {
     to: 'karura',
-    token: 'MATIC',
+    token: 'MATICet',
     xcm: {
-      fee: { token: 'MATIC', amount: '801280000000000' },
+      fee: { token: 'MATICet', amount: '801280000000000' },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -300,9 +300,9 @@ export const calamariTokensConfig: Record<string, ExtendedToken> = {
     ed: '9000000000000000',
     toRaw: () => ({ MantaCurrency: 17 }),
   },
-  MATIC: {
-    name: 'MATIC',
-    symbol: 'MATIC',
+  MATICet: {
+    name: 'MATICet',
+    symbol: 'MATICet',
     decimals: 18,
     ed: '10000000000000000',
     toRaw: () => ({ MantaCurrency: 20 }),

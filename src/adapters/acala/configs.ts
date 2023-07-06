@@ -405,9 +405,9 @@ export const karuraRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
   {
     to: 'calamari',
-    token: 'MATIC',
+    token: 'MATICet',
     xcm: {
-      fee: { token: 'MATIC', amount: '22745833333333333' },
+      fee: { token: 'MATICet', amount: '22745833333333333' },
     },
   },
   {
@@ -752,13 +752,12 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: '9000000000000000',
   },
-  MATIC: {
-    name: 'MATIC',
-    symbol: 'MATIC',
+  MATICet: {
+    name: 'MATICet',
+    symbol: 'MATICet',
     decimals: 18,
     ed: '10000000000000000',
   },
-
   LDO: {
     name: 'LDO',
     symbol: 'LDO',
