@@ -113,9 +113,9 @@ export const calamariRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
   {
     to: 'karura',
-    token: 'BUSD',
+    token: 'BUSDet',
     xcm: {
-      fee: { token: 'BUSD', amount: '808240000000000' },
+      fee: { token: 'BUSDet', amount: '808240000000000' },
       weightLimit: DEST_WEIGHT,
     },
   },
@@ -286,9 +286,9 @@ export const calamariTokensConfig: Record<string, ExtendedToken> = {
     ed: '40000000000000',
     toRaw: () => ({ MantaCurrency: 21 }),
   },
-  BUSD: {
-    name: 'BUSD',
-    symbol: 'BUSD',
+  BUSDet: {
+    name: 'BUSDet',
+    symbol: 'BUSDet',
     decimals: 18,
     ed: '10000000000000000',
     toRaw: () => ({ MantaCurrency: 23 }),

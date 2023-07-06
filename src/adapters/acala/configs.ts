@@ -391,9 +391,9 @@ export const karuraRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
   {
     to: 'calamari',
-    token: 'BUSD',
+    token: 'BUSDet',
     xcm: {
-      fee: { token: 'BUSD', amount: '25163950000000000' },
+      fee: { token: 'BUSDet', amount: '25163950000000000' },
     },
   },
   {
@@ -740,9 +740,9 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: '40000000000000',
   },
-  BUSD: {
-    name: 'BUSD',
-    symbol: 'BUSD',
+  BUSDet: {
+    name: 'BUSDet',
+    symbol: 'BUSDet',
     decimals: 18,
     ed: '10000000000000000',
   },
