@@ -134,6 +134,104 @@ export const acalaRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
       fee: { token: 'UNQ', amount: '' },
     },
   },
+  {
+    to: 'manta',
+    token: 'ACA',
+    xcm: {
+      fee: { token: 'ACA', amount: '520927169421' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'LDOT',
+    xcm: {
+      fee: { token: 'LDOT', amount: '1008515000' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'DAI',
+    xcm: {
+      fee: { token: 'DAI', amount: '808240000000000' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'USDCet',
+    xcm: {
+      fee: { token: 'USDCet', amount: '25212' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'USDT',
+    xcm: {
+      fee: { token: 'USDT', amount: '25212' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'WBTC',
+    xcm: {
+      fee: { token: 'WBTC', amount: '89' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'WETH',
+    xcm: {
+      fee: { token: 'WETH', amount: '13767145540521' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'BUSD',
+    xcm: {
+      fee: { token: 'BUSD', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'ARB',
+    xcm: {
+      fee: { token: 'ARB', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'LDO',
+    xcm: {
+      fee: { token: 'LDO', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'SHIB',
+    xcm: {
+      fee: { token: 'SHIB', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'UNI',
+    xcm: {
+      fee: { token: 'UNI', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'LINK',
+    xcm: {
+      fee: { token: 'LINK', amount: '0' },
+    },
+  },
+  {
+    to: 'manta',
+    token: 'APE',
+    xcm: {
+      fee: { token: 'APE', amount: '5863459302325581' },
+    },
+  },
 ];
 
 export const karuraRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
@@ -384,9 +482,9 @@ export const karuraRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
   {
     to: 'calamari',
-    token: 'BNB',
+    token: 'BNBet',
     xcm: {
-      fee: { token: 'BNB', amount: '81119080622803' },
+      fee: { token: 'BNBet', amount: '81119080622803' },
     },
   },
   {
@@ -398,9 +496,9 @@ export const karuraRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
   {
     to: 'calamari',
-    token: 'ARB',
+    token: 'ARBet',
     xcm: {
-      fee: { token: 'ARB', amount: '21146176470588235' },
+      fee: { token: 'ARBet', amount: '21146176470588235' },
     },
   },
   {
@@ -633,6 +731,7 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
   LDOT: { name: 'LDOT', symbol: 'LDOT', decimals: 10, ed: '500000000' },
   INTR: { name: 'INTR', symbol: 'INTR', decimals: 10, ed: '1000000000' },
   IBTC: { name: 'IBTC', symbol: 'IBTC', decimals: 8, ed: '100' },
+  USDT: { name: 'USDT', symbol: 'USDT', decimals: 6, ed: '10000' },
   GLMR: {
     name: 'GLMR',
     symbol: 'GLMR',
@@ -647,6 +746,12 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     ed: '100000000000000000',
   },
   DOT: { name: 'DOT', symbol: 'DOT', decimals: 10, ed: '100000000' },
+  USDCet: {
+    name: 'USDCet',
+    symbol: 'USDCet',
+    decimals: 6,
+    ed: '10000',
+  },
   DAI: {
     name: 'DAI',
     symbol: 'DAI',
@@ -670,6 +775,48 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     symbol: 'UNQ',
     decimals: 18,
     ed: '1250000000000000000',
+  },
+  BUSD: {
+    name: 'BUSD',
+    symbol: 'BUSD',
+    decimals: 18,
+    ed: '10000000000000000',
+  },
+  ARB: {
+    name: 'ARB',
+    symbol: 'ARB',
+    decimals: 18,
+    ed: '9000000000000000',
+  },
+  LDO: {
+    name: 'LDO',
+    symbol: 'LDO',
+    decimals: 18,
+    ed: '5000000000000000',
+  },
+  SHIB: {
+    name: 'SHIB',
+    symbol: 'SHIB',
+    decimals: 18,
+    ed: '1000000000000000000000',
+  },
+  UNI: {
+    name: 'UNI',
+    symbol: 'UNI',
+    decimals: 18,
+    ed: '2000000000000000',
+  },
+  LINK: {
+    name: 'LINK',
+    symbol: 'LINK',
+    decimals: 18,
+    ed: '2000000000000000',
+  },
+  APE: {
+    name: 'APE',
+    symbol: 'APE',
+    decimals: 18,
+    ed: '3000000000000000',
   },
 };
 
@@ -734,9 +881,9 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     decimals: 8,
     ed: '35',
   },
-  BNB: {
-    name: 'BNB',
-    symbol: 'BNB',
+  BNBet: {
+    name: 'BNBet',
+    symbol: 'BNBet',
     decimals: 18,
     ed: '40000000000000',
   },
@@ -746,9 +893,9 @@ export const karuraTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: '10000000000000000',
   },
-  ARB: {
-    name: 'ARB',
-    symbol: 'ARB',
+  ARBet: {
+    name: 'ARBet',
+    symbol: 'ARBet',
     decimals: 18,
     ed: '9000000000000000',
   },

@@ -24,6 +24,14 @@ export const polkadotRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
     token: 'DOT',
     xcm: { fee: { token: 'DOT', amount: '3549633' }, weightLimit: 'Unlimited' },
   },
+  {
+    to: 'manta',
+    token: 'DOT',
+    xcm: {
+      fee: { token: 'DOT', amount: '46262155' },
+      weightLimit: 'Unlimited',
+    },
+  },
 ];
 
 // TODO: should remove after kusama upgrade
@@ -136,7 +144,7 @@ class PolkadotBalanceAdapter extends BalanceAdapter {
     const storage = this.storages.balances(address);
 
     // fixme: should check `token !== this.nativeToken` instead
-    if (token !== 'KSM') {
+    if (token !== 'KSM' && token !== 'DOT') {
       throw new TokenNotFound(token);
     }
 
