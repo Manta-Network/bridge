@@ -185,48 +185,6 @@ export const acalaRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
   {
     to: 'manta',
-    token: 'BUSD',
-    xcm: {
-      fee: { token: 'BUSD', amount: '0' },
-    },
-  },
-  {
-    to: 'manta',
-    token: 'ARB',
-    xcm: {
-      fee: { token: 'ARB', amount: '0' },
-    },
-  },
-  {
-    to: 'manta',
-    token: 'LDO',
-    xcm: {
-      fee: { token: 'LDO', amount: '0' },
-    },
-  },
-  {
-    to: 'manta',
-    token: 'SHIB',
-    xcm: {
-      fee: { token: 'SHIB', amount: '0' },
-    },
-  },
-  {
-    to: 'manta',
-    token: 'UNI',
-    xcm: {
-      fee: { token: 'UNI', amount: '0' },
-    },
-  },
-  {
-    to: 'manta',
-    token: 'LINK',
-    xcm: {
-      fee: { token: 'LINK', amount: '0' },
-    },
-  },
-  {
-    to: 'manta',
     token: 'APE',
     xcm: {
       fee: { token: 'APE', amount: '5863459302325581' },
