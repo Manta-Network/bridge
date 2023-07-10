@@ -32,7 +32,7 @@ export const moonbeamRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
     to: 'manta',
     token: 'GLMR',
     xcm: {
-      fee: { token: 'GLMR', amount: '0' },
+      fee: { token: 'GLMR', amount: '921009000000000000' },
       weightLimit: 'Unlimited',
     },
   },
