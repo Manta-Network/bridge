@@ -467,7 +467,7 @@ export const mantaTokensConfig: Record<string, ExtendedToken> = {
     name: 'USDT',
     symbol: 'USDT',
     decimals: 6,
-    ed: '10000',
+    ed: '1000',
     toRaw: () => ({ MantaCurrency: 9 }),
   },
   USDCet: {
