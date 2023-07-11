@@ -734,42 +734,6 @@ export const acalaTokensConfig: Record<string, BasicToken> = {
     decimals: 18,
     ed: '1250000000000000000',
   },
-  BUSD: {
-    name: 'BUSD',
-    symbol: 'BUSD',
-    decimals: 18,
-    ed: '10000000000000000',
-  },
-  ARB: {
-    name: 'ARB',
-    symbol: 'ARB',
-    decimals: 18,
-    ed: '9000000000000000',
-  },
-  LDO: {
-    name: 'LDO',
-    symbol: 'LDO',
-    decimals: 18,
-    ed: '5000000000000000',
-  },
-  SHIB: {
-    name: 'SHIB',
-    symbol: 'SHIB',
-    decimals: 18,
-    ed: '1000000000000000000000',
-  },
-  UNI: {
-    name: 'UNI',
-    symbol: 'UNI',
-    decimals: 18,
-    ed: '2000000000000000',
-  },
-  LINK: {
-    name: 'LINK',
-    symbol: 'LINK',
-    decimals: 18,
-    ed: '2000000000000000',
-  },
   APE: {
     name: 'APE',
     symbol: 'APE',
