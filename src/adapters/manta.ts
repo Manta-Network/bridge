@@ -446,7 +446,7 @@ export const mantaTokensConfig: Record<string, ExtendedToken> = {
     name: 'GLMR',
     symbol: 'GLMR',
     decimals: 18,
-    ed: '100000000000000000',
+    ed: '1',
     toRaw: () => ({ MantaCurrency: 10 }),
   },
   ACA: {
