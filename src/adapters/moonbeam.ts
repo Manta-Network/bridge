@@ -27,6 +27,17 @@ export const moonriverRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
   },
 ];
 
+export const moonbeamRoutersConfig: Omit<RouteConfigs, 'from'>[] = [
+  {
+    to: 'manta',
+    token: 'GLMR',
+    xcm: {
+      fee: { token: 'GLMR', amount: '921009000000000000' },
+      weightLimit: 'Unlimited',
+    },
+  },
+];
+
 export const moonbeamTokensConfig: Record<string, BasicToken> = {
   GLMR: {
     name: 'GLMR',
@@ -211,7 +222,7 @@ class BaseMoonbeamAdapter extends BaseCrossChainAdapter {
 }
 export class MoonbeamAdapter extends BaseMoonbeamAdapter {
   constructor() {
-    super(chains.moonbeam, [], moonbeamTokensConfig);
+    super(chains.moonbeam, moonbeamRoutersConfig, moonbeamTokensConfig);
   }
 }
 
